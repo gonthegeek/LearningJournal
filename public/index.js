@@ -629,15 +629,18 @@ const AuthComponent = ({ auth, db }) => {
 };
 
 // --- TEACHER COMPONENTS ---
-const TeacherDashboard = ({ allStudentsData, onSelectStudent, onSignOut }) => {
+const TeacherDashboard = ({ allStudentsData, onSelectStudent, onSignOut, onRefresh }) => {
     const [sortBy, setSortBy] = useState('name'); // 'name', 'progress', 'lastActivity'
-    
-    // Debug logging
-    console.log('TeacherDashboard: allStudentsData', allStudentsData);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    const handleRefresh = async () => {
+        setIsRefreshing(true);
+        await onRefresh();
+        setIsRefreshing(false);
+    };
     
     const sortedStudents = useMemo(() => {
         if (!allStudentsData || !Array.isArray(allStudentsData)) {
-            console.log('No valid student data available');
             return [];
         }
         
@@ -735,10 +738,20 @@ const TeacherDashboard = ({ allStudentsData, onSelectStudent, onSignOut }) => {
                         <h1 className="text-3xl font-bold text-gray-800">Teacher Dashboard</h1>
                         <p className="text-gray-600">Overview of {(allStudentsData || []).length} student{(allStudentsData || []).length !== 1 ? 's' : ''}</p>
                     </div>
-                    <button onClick={onSignOut} className="flex items-center gap-2 bg-red-100 text-red-700 p-2 rounded-lg font-semibold text-sm hover:bg-red-200">
-                        <LogOut className="w-4 h-4" />
-                        Logout
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <button 
+                            onClick={handleRefresh} 
+                            disabled={isRefreshing}
+                            className="flex items-center gap-2 bg-blue-100 text-blue-700 p-2 rounded-lg font-semibold text-sm hover:bg-blue-200 disabled:opacity-50"
+                        >
+                            <span className={isRefreshing ? 'animate-spin' : ''}>🔄</span>
+                            {isRefreshing ? 'Refreshing...' : 'Refresh Data'}
+                        </button>
+                        <button onClick={onSignOut} className="flex items-center gap-2 bg-red-100 text-red-700 p-2 rounded-lg font-semibold text-sm hover:bg-red-200">
+                            <LogOut className="w-4 h-4" />
+                            Logout
+                        </button>
+                    </div>
                 </div>
             </header>
             
@@ -772,8 +785,6 @@ const TeacherDashboard = ({ allStudentsData, onSelectStudent, onSignOut }) => {
                             <Card key={student.id} className="cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-200 group" onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                console.log('Card clicked for student:', student.displayName);
-                                console.log('onSelectStudent function:', typeof onSelectStudent);
                                 onSelectStudent(student);
                             }}>
                                 {/* Header */}
@@ -896,11 +907,8 @@ const WorkbookContainer = ({ user, userData, onUpdate, onToggleTask, onSignOut, 
     };
 
     if (!userData) {
-        console.log('WorkbookContainer: userData is null/undefined');
         return <LoadingSpinner />;
     }
-
-    console.log('WorkbookContainer: userData received:', userData);
 
     return (
         <div className="bg-gray-100 min-h-screen font-sans">
@@ -981,7 +989,6 @@ function App() {
             setIsLoading(false);
             return;
         }
-        console.log("Initializing Firebase with config:", firebaseConfig);
         try {
             firebase.initializeApp(firebaseConfig);
             const auth = firebase.auth();
@@ -1026,25 +1033,36 @@ function App() {
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         
         if (userRole === 'teacher') {
-            const usersCollectionRef = db.collection('artifacts').doc(appId).collection('users');
-            const unsubscribe = usersCollectionRef.onSnapshot((querySnapshot) => {
-                const students = [];
-                querySnapshot.forEach((doc) => {
-                    // Exclude the teacher's own data from the student list
-                    if(doc.id !== user.uid) {
-                        students.push({ id: doc.id, ...doc.data() });
-                    }
-                });
-                setAllStudentsData(students);
-            });
-            return () => unsubscribe();
+            // For teachers: Fetch student data once initially only
+            const fetchStudentsData = async () => {
+                try {
+                    const usersCollectionRef = db.collection('artifacts').doc(appId).collection('users');
+                    const querySnapshot = await usersCollectionRef.get();
+                    const students = [];
+                    querySnapshot.forEach((doc) => {
+                        // Exclude the teacher's own data from the student list
+                        if(doc.id !== user.uid) {
+                            students.push({ id: doc.id, ...doc.data() });
+                        }
+                    });
+                    setAllStudentsData(students);
+                } catch (error) {
+                    console.error("Error fetching students data:", error);
+                }
+            };
+
+            // Initial fetch only - no automatic polling
+            fetchStudentsData();
+            
         } else { // Role is 'student'
+            // For students: Use real-time listener for their own data only (minimal reads)
             const docRef = db.collection('artifacts').doc(appId).collection('users').doc(user.uid);
             const unsubscribe = docRef.onSnapshot((docSnap) => {
                 if (docSnap.exists) {
                     setUserData(docSnap.data());
                 } else {
-                    console.log("No user data found for logged-in user. This might happen briefly during sign-up.");
+                    // No user data found - this might happen briefly during sign-up
+                    setUserData(null);
                 }
             }, (error) => {
                 console.error("Error fetching user data:", error);
@@ -1052,6 +1070,28 @@ function App() {
             return () => unsubscribe();
         }
     }, [firebaseServices, user, userRole]);
+
+    // Manual refresh function for teachers
+    const handleRefreshStudentData = async () => {
+        if (!firebaseServices || !user || userRole !== 'teacher') return;
+        
+        const { db } = firebaseServices;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        
+        try {
+            const usersCollectionRef = db.collection('artifacts').doc(appId).collection('users');
+            const querySnapshot = await usersCollectionRef.get();
+            const students = [];
+            querySnapshot.forEach((doc) => {
+                if(doc.id !== user.uid) {
+                    students.push({ id: doc.id, ...doc.data() });
+                }
+            });
+            setAllStudentsData(students);
+        } catch (error) {
+            console.error("Error refreshing students data:", error);
+        }
+    };
 
     const handleUpdateUserData = async (key, value) => {
         if (!firebaseServices || !user || !userData) return;
@@ -1104,15 +1144,12 @@ function App() {
     }
 
     if (userRole === 'teacher') {
-        console.log('Teacher mode, selectedStudent:', selectedStudent);
         if (selectedStudent) {
-             console.log('Rendering WorkbookContainer for student:', selectedStudent.displayName);
              return <WorkbookContainer 
                 user={user}
                 userData={selectedStudent}
                 isReadOnly={true}
                 onBack={() => {
-                    console.log('Back button clicked, clearing selectedStudent');
                     setSelectedStudent(null);
                 }}
                 // Teacher can only update the feedback part of reflection
@@ -1125,11 +1162,9 @@ function App() {
                 onSignOut={handleSignOut}
             />
         }
-        console.log('Rendering TeacherDashboard with students:', allStudentsData.length);
         return <TeacherDashboard allStudentsData={allStudentsData} onSelectStudent={(student) => {
-            console.log('Student selected:', student.displayName);
             setSelectedStudent(student);
-        }} onSignOut={handleSignOut} />
+        }} onRefresh={handleRefreshStudentData} onSignOut={handleSignOut} />
     }
 
     // Default is student view
