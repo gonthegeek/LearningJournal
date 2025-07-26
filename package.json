@@ -1,0 +1,23 @@
+{
+  "name": "learning-journal",
+  "version": "1.0.0",
+  "description": "A learning journal application with Firebase integration",
+  "scripts": {
+    "build": "./build.sh development",
+    "build:production": "./build.sh production",
+    "clean": "./clean.sh",
+    "serve": "firebase serve",
+    "deploy": "npm run build && firebase deploy",
+    "deploy:production": "npm run build:production && firebase deploy",
+    "precommit": "npm run clean"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gonthegeek/LearningJournal.git"
+  },
+  "author": "gonthegeek",
+  "license": "MIT",
+  "devDependencies": {
+    "firebase-tools": "^13.0.0"
+  }
+}
