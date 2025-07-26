@@ -4,11 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Learning Journal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/react-chartjs-2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <style>
         body {
             margin: 0;
@@ -33,7 +37,16 @@
     
     <!-- Environment Variables (injected by build process) -->
     <script id="env-config">
-        // Environment variables will be injected here by the build process
+        // Injected environment variables
+        window.__ENV__ = {
+            FIREBASE_API_KEY: "AIzaSyDFqLy36DHQECwW19ylzHThvTkMp_x5FX0",
+            FIREBASE_AUTH_DOMAIN: "learningjournal-27009.firebaseapp.com",
+            FIREBASE_PROJECT_ID: "learningjournal-27009",
+            FIREBASE_STORAGE_BUCKET: "learningjournal-27009.firebasestorage.app",
+            FIREBASE_MESSAGING_SENDER_ID: "567657400824",
+            FIREBASE_APP_ID: "1:567657400824:web:2807f9c02332f3b73eae0d",
+            FIREBASE_MEASUREMENT_ID: "G-CH8DRPEBBH"
+        };
     </script>
     
     <!-- Your React App -->

@@ -1,23 +1,101 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { 
-    LayoutDashboard, BookOpen, Target, Linkedin, Award, Zap, Wind, CheckSquare, Square, UserPlus, Users,
-    CalendarDays, Smile, Meh, Frown, Star, Bot, ImagePlus, Trophy, BookCopy, MessageSquare, BrainCircuit, Upload, ChevronDown, Loader2, Edit, Save, LogOut, Mail, KeyRound, ArrowLeft, GraduationCap
-} from 'lucide-react';
-import { Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+// Global variables from CDN scripts
+const React = window.React;
+const { useState, useMemo, useEffect, useRef } = React;
+const ReactDOM = window.ReactDOM;
 
-// Firebase Imports
-import { initializeApp } from 'firebase/app';
-import { 
-    getAuth, 
-    onAuthStateChanged, 
-    createUserWithEmailAndPassword, 
-    signInWithEmailAndPassword,
-    signOut
-} from 'firebase/auth';
-import { getFirestore, doc, setDoc, onSnapshot, collection, query } from 'firebase/firestore';
+// Create Lucide icon components using the Lucide library
+const createLucideIcon = (iconName) => {
+    return ({ className = "w-4 h-4", ...props }) => {
+        const iconData = window.lucide.icons[iconName];
+        if (!iconData) {
+            console.warn(`Icon ${iconName} not found`);
+            return null;
+        }
+        
+        return React.createElement('svg', {
+            ...props,
+            className: className,
+            width: iconData[0],
+            height: iconData[1],
+            viewBox: iconData[2],
+            fill: 'none',
+            stroke: 'currentColor',
+            strokeWidth: '2',
+            strokeLinecap: 'round',
+            strokeLinejoin: 'round',
+            dangerouslySetInnerHTML: { __html: iconData[3] }
+        });
+    };
+};
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+// Create icon components
+const LayoutDashboard = createLucideIcon('layout-dashboard');
+const BookOpen = createLucideIcon('book-open');
+const Target = createLucideIcon('target');
+const Linkedin = createLucideIcon('linkedin');
+const Award = createLucideIcon('award');
+const Zap = createLucideIcon('zap');
+const Wind = createLucideIcon('wind');
+const CheckSquare = createLucideIcon('check-square');
+const Square = createLucideIcon('square');
+const UserPlus = createLucideIcon('user-plus');
+const Users = createLucideIcon('users');
+const CalendarDays = createLucideIcon('calendar-days');
+const Smile = createLucideIcon('smile');
+const Meh = createLucideIcon('meh');
+const Frown = createLucideIcon('frown');
+const Star = createLucideIcon('star');
+const Bot = createLucideIcon('bot');
+const ImagePlus = createLucideIcon('image-plus');
+const Trophy = createLucideIcon('trophy');
+const BookCopy = createLucideIcon('book-copy');
+const MessageSquare = createLucideIcon('message-square');
+const BrainCircuit = createLucideIcon('brain-circuit');
+const Upload = createLucideIcon('upload');
+const ChevronDown = createLucideIcon('chevron-down');
+const Loader2 = createLucideIcon('loader');
+const Edit = createLucideIcon('edit');
+const Save = createLucideIcon('save');
+const LogOut = createLucideIcon('log-out');
+const Mail = createLucideIcon('mail');
+const KeyRound = createLucideIcon('key-round');
+const ArrowLeft = createLucideIcon('arrow-left');
+const GraduationCap = createLucideIcon('graduation-cap');
+const ExternalLink = createLucideIcon('external-link');
+const Plus = createLucideIcon('plus');
+
+// Custom Bar Chart Component using Chart.js
+const Bar = ({ data, options }) => {
+    const chartRef = useRef(null);
+    const chartInstance = useRef(null);
+
+    useEffect(() => {
+        if (chartRef.current && window.Chart) {
+            // Destroy existing chart if it exists
+            if (chartInstance.current) {
+                chartInstance.current.destroy();
+            }
+
+            const ctx = chartRef.current.getContext('2d');
+            chartInstance.current = new window.Chart(ctx, {
+                type: 'bar',
+                data: data,
+                options: options || {}
+            });
+        }
+
+        return () => {
+            if (chartInstance.current) {
+                chartInstance.current.destroy();
+            }
+        };
+    }, [data, options]);
+
+    return <canvas ref={chartRef}></canvas>;
+};
+
+// Firebase from global scope (compat mode)
+const firebase = window.firebase;
 
 // --- CONSTANTS & CONFIG ---
 const TEACHER_EMAIL = "gronzon31@gmail.com";
@@ -26,13 +104,13 @@ const SKILLS_LIST = ["Git & GitHub", "SQL & Databases", "HTML", "CSS", "JavaScri
 const CONFIDENCE_LEVELS = ["Not Started", "Beginner", "Intermediate", "Advanced", "Expert"];
 
 const ACHIEVEMENTS_LIST = [
-    { id: 'first_commit', name: 'First Code Commit', description: 'You made your first change!', icon: <Star /> },
-    { id: 'foundation_complete', name: 'Foundation Complete', description: 'Completed all Foundation phase weeks.', icon: <Trophy /> },
-    { id: 'building_complete', name: 'Builder', description: 'Completed all Building phase weeks.', icon: <Trophy /> },
-    { id: 'advanced_complete', name: 'Advanced Learner', description: 'Completed all Advanced phase weeks.', icon: <Trophy /> },
-    { id: 'first_project', name: 'Project Pioneer', description: 'Added your first project to the gallery.', icon: <Award /> },
-    { id: 'all_courses', name: 'LinkedIn Legend', description: 'Completed all core LinkedIn courses.', icon: <Linkedin /> },
-    { id: '10_day_log', name: 'Consistent Learner', description: 'Logged 10 daily learning sessions.', icon: <CalendarDays /> },
+    { id: 'first_commit', name: 'First Code Commit', description: 'You made your first change!', icon: 'star' },
+    { id: 'foundation_complete', name: 'Foundation Complete', description: 'Completed all Foundation phase weeks.', icon: 'trophy' },
+    { id: 'building_complete', name: 'Builder', description: 'Completed all Building phase weeks.', icon: 'award' },
+    { id: 'advanced_complete', name: 'Advanced Learner', description: 'Completed all Advanced phase weeks.', icon: 'target' },
+    { id: 'first_project', name: 'Project Pioneer', description: 'Added your first project to the gallery.', icon: 'image-plus' },
+    { id: 'all_courses', name: 'LinkedIn Legend', description: 'Completed all core LinkedIn courses.', icon: 'linkedin' },
+    { id: '10_day_log', name: 'Consistent Learner', description: 'Logged 10 daily learning sessions.', icon: 'calendar-days' },
 ];
 
 const COURSES_LIST = [
@@ -109,7 +187,7 @@ const ProgressBar = ({ progress }) => (
 );
 const LoadingSpinner = () => (
     <div className="flex justify-center items-center h-full p-10">
-        <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
     </div>
 );
 
@@ -155,9 +233,9 @@ const WeeklyPlanSheet = ({ userData, onToggleTask, isReadOnly = false }) => {
 
     const ChecklistItem = ({ task, onToggle }) => (
         <div onClick={isReadOnly ? null : onToggle} className={`flex items-center p-3 bg-gray-50 rounded-lg ${!isReadOnly ? 'cursor-pointer hover:bg-gray-100' : ''} transition-colors`}>
-            {task.completed ? <CheckSquare className="w-6 h-6 mr-3 text-blue-500 flex-shrink-0" /> : <Square className="w-6 h-6 mr-3 text-gray-400 flex-shrink-0" />}
+            {task.completed ? <CheckSquare className="w-5 h-5 mr-3 text-green-600" /> : <Square className="w-5 h-5 mr-3 text-gray-400" />}
             <span className={`flex-1 ${task.completed ? 'text-gray-500 line-through' : 'text-gray-700'}`}>{task.text}</span>
-            {task.link && (<a href={task.link} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="ml-2 p-1 rounded-full hover:bg-blue-100"><Linkedin className="w-4 h-4 text-blue-600" /></a>)}
+            {task.link && (<a href={task.link} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="ml-2 p-1 rounded-full hover:bg-blue-100"><ExternalLink className="w-4 h-4 text-blue-600" /></a>)}
         </div>
     );
 
@@ -181,7 +259,7 @@ const WeeklyPlanSheet = ({ userData, onToggleTask, isReadOnly = false }) => {
                                     <span className="text-sm font-semibold text-gray-600 w-12 text-right">{week.progress}%</span>
                                 </div>
                             </div>
-                            <ChevronDown className={`w-6 h-6 text-gray-500 transition-transform ${openWeek === week.id ? 'rotate-180' : ''}`} />
+                            <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${openWeek === week.id ? 'rotate-180' : ''}`} />
                         </div>
                         {openWeek === week.id && (
                             <div className="p-4 border-t border-gray-200 bg-white">
@@ -219,11 +297,13 @@ const DailyLogSheet = ({ userData, onUpdate, isReadOnly = false }) => {
                 <div className="flex gap-4 mb-4">
                     <input type="text" value={entry} onChange={e => setEntry(e.target.value)} placeholder="What did you learn today?" className="flex-grow p-2 border rounded-md" />
                     <div className="flex items-center gap-2">
-                        <button onClick={() => setMood('😊')} className={`p-2 rounded-full ${mood === '😊' ? 'bg-green-200' : ''}`}><Smile /></button>
-                        <button onClick={() => setMood('🤔')} className={`p-2 rounded-full ${mood === '🤔' ? 'bg-yellow-200' : ''}`}><Meh /></button>
-                        <button onClick={() => setMood('😩')} className={`p-2 rounded-full ${mood === '😩' ? 'bg-red-200' : ''}`}><Frown /></button>
+                        <button onClick={() => setMood('😊')} className={`p-2 rounded-full ${mood === '😊' ? 'bg-green-200' : ''}`}><Smile className="w-4 h-4" /></button>
+                        <button onClick={() => setMood('🤔')} className={`p-2 rounded-full ${mood === '🤔' ? 'bg-yellow-200' : ''}`}><Meh className="w-4 h-4" /></button>
+                        <button onClick={() => setMood('😩')} className={`p-2 rounded-full ${mood === '😩' ? 'bg-red-200' : ''}`}><Frown className="w-4 h-4" /></button>
                     </div>
-                    <button onClick={handleAddLog} className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Log Session</button>
+                    <button onClick={handleAddLog} className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 flex items-center gap-2">
+                        <Plus className="w-4 h-4" /> Log Session
+                    </button>
                 </div>
             )}
             <div className="space-y-3 max-h-96 overflow-y-auto">
@@ -396,13 +476,18 @@ const AchievementsSheet = ({ userData }) => {
         <Card>
             <h3 className="text-xl font-bold mb-4">Achievements</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {ACHIEVEMENTS_LIST.map(ach => (
-                    <div key={ach.id} className={`p-4 text-center rounded-lg transition-all ${unlockedAchievements.has(ach.id) ? 'bg-green-100 text-green-800 shadow-lg' : 'bg-gray-200 text-gray-500'}`}>
-                        <div className={`text-4xl mx-auto mb-2 ${unlockedAchievements.has(ach.id) ? 'text-yellow-500' : ''}`}>{ach.icon}</div>
+                {ACHIEVEMENTS_LIST.map(ach => {
+                    const IconComponent = createLucideIcon(ach.icon);
+                    return (
+                        <div key={ach.id} className={`p-4 text-center rounded-lg transition-all ${unlockedAchievements.has(ach.id) ? 'bg-green-100 text-green-800 shadow-lg' : 'bg-gray-200 text-gray-500'}`}>
+                            <div className={`flex justify-center mx-auto mb-2 ${unlockedAchievements.has(ach.id) ? 'text-yellow-500' : 'text-gray-400'}`}>
+                                <IconComponent className={`w-8 h-8 ${unlockedAchievements.has(ach.id) ? 'text-yellow-500' : 'text-gray-400'}`} />
+                            </div>
                         <h4 className="font-bold">{ach.name}</h4>
                         <p className="text-xs">{ach.description}</p>
                     </div>
-                ))}
+                    );
+                })}
             </div>
         </Card>
     );
@@ -468,13 +553,13 @@ const AuthComponent = ({ auth, db }) => {
         
         try {
             if (isLogin) {
-                await signInWithEmailAndPassword(auth, email, password);
+                await auth.signInWithEmailAndPassword(email, password);
             } else {
-                const tempUserCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const tempUserCredential = await auth.createUserWithEmailAndPassword(email, password);
                 const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                const docRef = doc(db, 'artifacts', appId, 'users', tempUserCredential.user.uid);
+                const docRef = db.collection('artifacts').doc(appId).collection('users').doc(tempUserCredential.user.uid);
                 const initialData = createInitialUserData(displayName);
-                await setDoc(docRef, initialData);
+                await docRef.set(initialData);
             }
         } catch (err) {
             setError(err.message);
@@ -492,16 +577,16 @@ const AuthComponent = ({ auth, db }) => {
                     {!isLogin && (
                         <div>
                             <label className="text-sm font-bold text-gray-700 block mb-2">Display Name</label>
-                            <div className="relative"><Users className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"/><input type="text" value={displayName} onChange={e => setDisplayName(e.target.value)} placeholder="Your Name" required className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"/></div>
+                            <div className="relative"><span className="absolute left-3 top-1/2 transform -translate-y-1/2">👥</span><input type="text" value={displayName} onChange={e => setDisplayName(e.target.value)} placeholder="Your Name" required className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"/></div>
                         </div>
                     )}
                     <div>
                         <label className="text-sm font-bold text-gray-700 block mb-2">Email</label>
-                        <div className="relative"><Mail className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"/><input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"/></div>
+                        <div className="relative"><Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" /><input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"/></div>
                     </div>
                     <div>
                         <label className="text-sm font-bold text-gray-700 block mb-2">Password</label>
-                        <div className="relative"><KeyRound className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"/><input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"/></div>
+                        <div className="relative"><KeyRound className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" /><input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"/></div>
                     </div>
                     {error && <p className="text-red-500 text-sm text-center">{error}</p>}
                     <button type="submit" disabled={loading} className="w-full bg-blue-600 text-white font-bold py-3 rounded-md hover:bg-blue-700 transition-colors disabled:bg-blue-300 flex justify-center items-center">
@@ -528,7 +613,7 @@ const TeacherDashboard = ({ allStudentsData, onSelectStudent, onSignOut }) => {
                         <p className="text-gray-600">Overview of all student progress.</p>
                     </div>
                     <button onClick={onSignOut} className="flex items-center gap-2 bg-red-100 text-red-700 p-2 rounded-lg font-semibold text-sm hover:bg-red-200">
-                        <LogOut className="w-4 h-4" />
+                        🚪
                         Logout
                     </button>
                 </div>
@@ -540,7 +625,7 @@ const TeacherDashboard = ({ allStudentsData, onSelectStudent, onSignOut }) => {
                          return (
                             <Card key={student.id} className="cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-transform" onClick={() => onSelectStudent(student)}>
                                 <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center"><GraduationCap className="w-6 h-6 text-blue-600"/></div>
+                                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center"><span className="text-blue-600">🎓</span></div>
                                     <div>
                                         <h3 className="font-bold text-lg">{student.displayName}</h3>
                                         <p className="text-sm text-gray-500">Overall Progress: {totalProgress}%</p>
@@ -583,14 +668,14 @@ const WorkbookContainer = ({ user, userData, onUpdate, onToggleTask, onSignOut, 
     };
 
     const TABS = {
-        'Dashboard': { icon: <LayoutDashboard />, component: <DashboardSheet userData={userData} /> },
-        'Weekly Plan': { icon: <BookOpen />, component: <WeeklyPlanSheet userData={userData} onToggleTask={onToggleTask} isReadOnly={isReadOnly} /> },
-        'Daily Log': { icon: <CalendarDays />, component: <DailyLogSheet userData={userData} onUpdate={onUpdate} isReadOnly={isReadOnly} /> },
-        'Skills Matrix': { icon: <BrainCircuit />, component: <SkillsMatrixSheet userData={userData} onUpdate={onUpdate} isReadOnly={isReadOnly} /> },
-        'Project Gallery': { icon: <ImagePlus />, component: <ProjectGallerySheet userData={userData} onUpdate={onUpdate} isReadOnly={isReadOnly} /> },
-        'Course Tracker': { icon: <BookCopy />, component: <CourseTrackerSheet userData={userData} onUpdate={onUpdate} isReadOnly={isReadOnly} /> },
-        'Achievements': { icon: <Trophy />, component: <AchievementsSheet userData={userData} /> },
-        'Reflection': { icon: <MessageSquare />, component: <ReflectionSheet userData={userData} onUpdate={onUpdate} isReadOnly={isReadOnly || user.email === TEACHER_EMAIL} /> },
+        'Dashboard': { icon: <LayoutDashboard className="w-4 h-4" />, component: <DashboardSheet userData={userData} /> },
+        'Weekly Plan': { icon: <BookOpen className="w-4 h-4" />, component: <WeeklyPlanSheet userData={userData} onToggleTask={onToggleTask} isReadOnly={isReadOnly} /> },
+        'Daily Log': { icon: <CalendarDays className="w-4 h-4" />, component: <DailyLogSheet userData={userData} onUpdate={onUpdate} isReadOnly={isReadOnly} /> },
+        'Skills Matrix': { icon: <BrainCircuit className="w-4 h-4" />, component: <SkillsMatrixSheet userData={userData} onUpdate={onUpdate} isReadOnly={isReadOnly} /> },
+        'Project Gallery': { icon: <ImagePlus className="w-4 h-4" />, component: <ProjectGallerySheet userData={userData} onUpdate={onUpdate} isReadOnly={isReadOnly} /> },
+        'Course Tracker': { icon: <BookCopy className="w-4 h-4" />, component: <CourseTrackerSheet userData={userData} onUpdate={onUpdate} isReadOnly={isReadOnly} /> },
+        'Achievements': { icon: <Trophy className="w-4 h-4" />, component: <AchievementsSheet userData={userData} /> },
+        'Reflection': { icon: <MessageSquare className="w-4 h-4" />, component: <ReflectionSheet userData={userData} onUpdate={onUpdate} isReadOnly={isReadOnly || user.email === TEACHER_EMAIL} /> },
     };
 
     if (!userData) return <LoadingSpinner />;
@@ -607,16 +692,16 @@ const WorkbookContainer = ({ user, userData, onUpdate, onToggleTask, onSignOut, 
                         <div className="flex items-center gap-4">
                             {!isReadOnly && (
                                 <div className="flex items-center gap-2 bg-gray-100 p-2 rounded-lg">
-                                    <Users className="w-5 h-5 text-gray-600"/>
+                                    <span className="text-gray-600">👥</span>
                                     {isEditingName ? (
                                         <div className="flex items-center gap-2">
                                             <input type="text" value={newDisplayName} onChange={(e) => setNewDisplayName(e.target.value)} className="p-1 border rounded-md text-sm" autoFocus />
-                                            <button onClick={handleSaveName} className="p-1 text-green-600 hover:bg-green-100 rounded-full"><Save className="w-4 h-4"/></button>
+                                            <button onClick={handleSaveName} className="p-1 text-green-600 hover:bg-green-100 rounded-full"><Save className="w-4 h-4" /></button>
                                         </div>
                                     ) : (
                                         <div className="flex items-center gap-2">
                                             <span className="text-sm font-medium text-gray-700">{userData?.displayName || 'Loading...'}</span>
-                                            <button onClick={() => setIsEditingName(true)} className="p-1 text-gray-500 hover:bg-gray-200 rounded-full"><Edit className="w-4 h-4"/></button>
+                                            <button onClick={() => setIsEditingName(true)} className="p-1 text-gray-500 hover:bg-gray-200 rounded-full"><Edit className="w-4 h-4" /></button>
                                         </div>
                                     )}
                                 </div>
@@ -657,7 +742,7 @@ const WorkbookContainer = ({ user, userData, onUpdate, onToggleTask, onSignOut, 
     );
 };
 
-export default function App() {
+function App() {
     const [firebaseServices, setFirebaseServices] = useState(null);
     const [user, setUser] = useState(null);
     const [userRole, setUserRole] = useState('student');
@@ -675,9 +760,9 @@ export default function App() {
             return;
         }
         console.log("Initializing Firebase with config:", firebaseConfig);
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
         setFirebaseServices({ auth, db });
     }, []);
 
@@ -685,7 +770,7 @@ export default function App() {
     useEffect(() => {
         if (!firebaseServices) return;
         const { auth } = firebaseServices;
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
+        const unsubscribe = auth.onAuthStateChanged((user) => {
             setUser(user);
             if (user && user.email === TEACHER_EMAIL) {
                 setUserRole('teacher');
@@ -709,9 +794,8 @@ export default function App() {
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         
         if (userRole === 'teacher') {
-            const usersCollectionRef = collection(db, 'artifacts', appId, 'users');
-            const q = query(usersCollectionRef);
-            const unsubscribe = onSnapshot(q, (querySnapshot) => {
+            const usersCollectionRef = db.collection('artifacts').doc(appId).collection('users');
+            const unsubscribe = usersCollectionRef.onSnapshot((querySnapshot) => {
                 const students = [];
                 querySnapshot.forEach((doc) => {
                     // Exclude the teacher's own data from the student list
@@ -723,9 +807,9 @@ export default function App() {
             });
             return () => unsubscribe();
         } else { // Role is 'student'
-            const docRef = doc(db, 'artifacts', appId, 'users', user.uid);
-            const unsubscribe = onSnapshot(docRef, (docSnap) => {
-                if (docSnap.exists()) {
+            const docRef = db.collection('artifacts').doc(appId).collection('users').doc(user.uid);
+            const unsubscribe = docRef.onSnapshot((docSnap) => {
+                if (docSnap.exists) {
                     setUserData(docSnap.data());
                 } else {
                     console.log("No user data found for logged-in user. This might happen briefly during sign-up.");
@@ -741,18 +825,18 @@ export default function App() {
         if (!firebaseServices || !user || !userData) return;
         const { db } = firebaseServices;
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const docRef = doc(db, 'artifacts', appId, 'users', user.uid);
+        const docRef = db.collection('artifacts').doc(appId).collection('users').doc(user.uid);
         
         const updatedData = { ...userData, [key]: value };
-        await setDoc(docRef, updatedData, { merge: true });
+        await docRef.set(updatedData, { merge: true });
     };
 
     const handleTeacherUpdateReflection = async (studentId, key, value) => {
         if (!firebaseServices || !user || userRole !== 'teacher') return;
         const { db } = firebaseServices;
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const docRef = doc(db, 'artifacts', appId, 'users', studentId);
-        await setDoc(docRef, { reflection: { [key]: value } }, { merge: true });
+        const docRef = db.collection('artifacts').doc(appId).collection('users').doc(studentId);
+        await docRef.set({ reflection: { [key]: value } }, { merge: true });
     }
     
     const handleToggleTask = async (weekId, taskIndex) => {
@@ -775,7 +859,7 @@ export default function App() {
 
     const handleSignOut = async () => {
         if (!firebaseServices) return;
-        await signOut(firebaseServices.auth);
+        await firebaseServices.auth.signOut();
         setSelectedStudent(null);
     };
 
@@ -818,3 +902,7 @@ export default function App() {
         />
     );
 }
+
+// Render the app
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(React.createElement(App));
