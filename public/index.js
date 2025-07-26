@@ -3,28 +3,54 @@ const React = window.React;
 const { useState, useMemo, useEffect, useRef } = React;
 const ReactDOM = window.ReactDOM;
 
-// Create Lucide icon components using the Lucide library
+// Create Lucide icon components using simple SVG fallbacks
 const createLucideIcon = (iconName) => {
     return ({ className = "w-4 h-4", ...props }) => {
-        const iconData = window.lucide.icons[iconName];
-        if (!iconData) {
-            console.warn(`Icon ${iconName} not found`);
-            return null;
-        }
+        // Simple icon mapping with basic SVG fallbacks
+        const iconMap = {
+            'layout-dashboard': '📊',
+            'book-open': '📖',
+            'target': '🎯',
+            'linkedin': '💼',
+            'award': '🏆',
+            'zap': '⚡',
+            'wind': '💨',
+            'check-square': '✅',
+            'square': '⬜',
+            'user-plus': '👤',
+            'users': '👥',
+            'calendar-days': '📅',
+            'smile': '😊',
+            'meh': '😐',
+            'frown': '😔',
+            'star': '⭐',
+            'bot': '🤖',
+            'image-plus': '🖼️',
+            'trophy': '🏆',
+            'book-copy': '📚',
+            'message-square': '💬',
+            'brain-circuit': '🧠',
+            'upload': '⬆️',
+            'chevron-down': '▼',
+            'loader': '⟳',
+            'edit': '✏️',
+            'save': '💾',
+            'log-out': '🚪',
+            'mail': '📧',
+            'key-round': '🔑',
+            'arrow-left': '←',
+            'graduation-cap': '🎓',
+            'external-link': '🔗',
+            'plus': '+'
+        };
         
-        return React.createElement('svg', {
+        const fallback = iconMap[iconName] || '?';
+        
+        return React.createElement('span', {
+            className: `inline-flex items-center justify-center ${className}`,
             ...props,
-            className: className,
-            width: iconData[0],
-            height: iconData[1],
-            viewBox: iconData[2],
-            fill: 'none',
-            stroke: 'currentColor',
-            strokeWidth: '2',
-            strokeLinecap: 'round',
-            strokeLinejoin: 'round',
-            dangerouslySetInnerHTML: { __html: iconData[3] }
-        });
+            style: { fontSize: '1em', lineHeight: 1 }
+        }, fallback);
     };
 };
 
@@ -175,7 +201,7 @@ const motivationalQuotes = [
 ];
 
 // --- HELPER & GENERIC COMPONENTS ---
-const Card = ({ children, className = '' }) => <div className={`bg-white rounded-lg shadow p-6 ${className}`}>{children}</div>;
+const Card = ({ children, className = '', ...props }) => <div className={`bg-white rounded-lg shadow p-6 ${className}`} {...props}>{children}</div>;
 const PhaseIndicator = ({ phase }) => {
     const phaseColors = { Foundation: 'bg-green-100 text-green-800', Building: 'bg-blue-100 text-blue-800', Advanced: 'bg-purple-100 text-purple-800' };
     return <span className={`px-2 py-1 text-xs font-semibold rounded-full ${phaseColors[phase]}`}>{phase}</span>;
@@ -604,38 +630,229 @@ const AuthComponent = ({ auth, db }) => {
 
 // --- TEACHER COMPONENTS ---
 const TeacherDashboard = ({ allStudentsData, onSelectStudent, onSignOut }) => {
+    const [sortBy, setSortBy] = useState('name'); // 'name', 'progress', 'lastActivity'
+    
+    // Debug logging
+    console.log('TeacherDashboard: allStudentsData', allStudentsData);
+    
+    const sortedStudents = useMemo(() => {
+        if (!allStudentsData || !Array.isArray(allStudentsData)) {
+            console.log('No valid student data available');
+            return [];
+        }
+        
+        return [...allStudentsData].sort((a, b) => {
+            switch (sortBy) {
+                case 'progress':
+                    const progressA = (a.weeks || []).reduce((acc, week) => acc + (week.progress || 0), 0) / Math.max((a.weeks || []).length, 1);
+                    const progressB = (b.weeks || []).reduce((acc, week) => acc + (week.progress || 0), 0) / Math.max((b.weeks || []).length, 1);
+                    return progressB - progressA;
+                case 'lastActivity':
+                    const lastLogA = (a.dailyLogs && a.dailyLogs.length) ? new Date(a.dailyLogs[a.dailyLogs.length - 1].date) : new Date(0);
+                    const lastLogB = (b.dailyLogs && b.dailyLogs.length) ? new Date(b.dailyLogs[b.dailyLogs.length - 1].date) : new Date(0);
+                    return lastLogB - lastLogA;
+                default: // name
+                    return (a.displayName || 'Unknown').localeCompare(b.displayName || 'Unknown');
+            }
+        });
+    }, [allStudentsData, sortBy]);
+
+    const getLastActivityDate = (student) => {
+        // Check multiple sources for last activity
+        const sources = [];
+        
+        // Check daily logs (handle both 'dailyLogs' and 'dailyLog' property names)
+        const dailyLogs = student.dailyLogs || student.dailyLog || [];
+        if (Array.isArray(dailyLogs) && dailyLogs.length > 0) {
+            const lastLog = dailyLogs[dailyLogs.length - 1];
+            if (lastLog && lastLog.date) {
+                sources.push(new Date(lastLog.date));
+            }
+        }
+        
+        // Check week progress (last completed task)
+        if (student.weeks && Array.isArray(student.weeks)) {
+            student.weeks.forEach(week => {
+                if (week.tasks && Array.isArray(week.tasks)) {
+                    week.tasks.forEach(task => {
+                        if (task.completed && task.completedDate) {
+                            sources.push(new Date(task.completedDate));
+                        }
+                    });
+                }
+            });
+        }
+        
+        // If no activity found
+        if (sources.length === 0) return 'No activity';
+        
+        // Get the most recent activity
+        const lastActivity = new Date(Math.max(...sources));
+        const today = new Date();
+        const diffTime = Math.abs(today - lastActivity);
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (diffDays === 0) return 'Today';
+        if (diffDays === 1) return 'Yesterday';
+        if (diffDays <= 7) return `${diffDays} days ago`;
+        if (diffDays <= 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+        return lastActivity.toLocaleDateString();
+    };
+
+    const getStudentStats = (student) => {
+        // Ensure we have safe fallbacks for all student data
+        const weeks = student.weeks || [];
+        const skills = student.skills || {};
+        const projects = student.projects || [];
+        const dailyLogs = student.dailyLogs || student.dailyLog || []; // Handle both property names
+        
+        const totalProgress = weeks.length > 0 
+            ? Math.round(weeks.reduce((acc, week) => acc + (week.progress || 0), 0) / weeks.length)
+            : 0;
+            
+        const completedTasks = weeks.reduce((acc, week) => {
+            const tasks = week.tasks || [];
+            return acc + tasks.filter(task => task.completed).length;
+        }, 0);
+        
+        const totalTasks = weeks.reduce((acc, week) => {
+            const tasks = week.tasks || [];
+            return acc + tasks.length;
+        }, 0);
+        
+        const skillsCount = Object.keys(skills).length;
+        const projectsCount = projects.length;
+        const logsCount = dailyLogs.length;
+        
+        return { totalProgress, completedTasks, totalTasks, skillsCount, projectsCount, logsCount };
+    };
+
     return (
         <div className="bg-gray-100 min-h-screen font-sans">
              <header className="bg-white shadow-md p-4 sticky top-0 z-20">
                 <div className="container mx-auto flex justify-between items-center">
                     <div>
                         <h1 className="text-3xl font-bold text-gray-800">Teacher Dashboard</h1>
-                        <p className="text-gray-600">Overview of all student progress.</p>
+                        <p className="text-gray-600">Overview of {(allStudentsData || []).length} student{(allStudentsData || []).length !== 1 ? 's' : ''}</p>
                     </div>
                     <button onClick={onSignOut} className="flex items-center gap-2 bg-red-100 text-red-700 p-2 rounded-lg font-semibold text-sm hover:bg-red-200">
-                        🚪
+                        <LogOut className="w-4 h-4" />
                         Logout
                     </button>
                 </div>
             </header>
+            
             <main className="container mx-auto p-4 md:p-8">
+                {/* Controls */}
+                <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+                    <div className="flex items-center justify-between">
+                        <h2 className="text-lg font-semibold text-gray-800">Student Overview</h2>
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm text-gray-600">Sort by:</span>
+                            <select 
+                                value={sortBy} 
+                                onChange={(e) => setSortBy(e.target.value)}
+                                className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:ring-blue-500 focus:border-blue-500"
+                            >
+                                <option value="name">Name</option>
+                                <option value="progress">Progress</option>
+                                <option value="lastActivity">Last Activity</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Students Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {allStudentsData.map(student => {
-                         const totalProgress = Math.round(student.weeks.reduce((acc, week) => acc + week.progress, 0) / student.weeks.length);
+                    {sortedStudents.map(student => {
+                         const stats = getStudentStats(student);
+                         const lastActivity = getLastActivityDate(student);
+                         
                          return (
-                            <Card key={student.id} className="cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-transform" onClick={() => onSelectStudent(student)}>
-                                <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center"><span className="text-blue-600">🎓</span></div>
-                                    <div>
-                                        <h3 className="font-bold text-lg">{student.displayName}</h3>
-                                        <p className="text-sm text-gray-500">Overall Progress: {totalProgress}%</p>
+                            <Card key={student.id} className="cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-200 group" onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                console.log('Card clicked for student:', student.displayName);
+                                console.log('onSelectStudent function:', typeof onSelectStudent);
+                                onSelectStudent(student);
+                            }}>
+                                {/* Header */}
+                                <div className="flex items-center gap-4 mb-4">
+                                    <div className="w-14 h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center shadow-md">
+                                        <GraduationCap className="w-6 h-6 text-white" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <h3 className="font-bold text-lg text-gray-800 group-hover:text-blue-600 transition-colors">{student.displayName}</h3>
+                                        <p className="text-sm text-gray-500">Last activity: {lastActivity}</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="text-2xl font-bold text-blue-600">{stats.totalProgress}%</div>
+                                        <div className="text-xs text-gray-500">Overall</div>
                                     </div>
                                 </div>
-                                <div className="mt-4"><ProgressBar progress={totalProgress} /></div>
+
+                                {/* Progress Bar */}
+                                <div className="mb-4">
+                                    <ProgressBar progress={stats.totalProgress} />
+                                </div>
+
+                                {/* Quick Stats */}
+                                <div className="grid grid-cols-2 gap-4 text-sm">
+                                    <div className="bg-gray-50 rounded-lg p-3">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <CheckSquare className="w-4 h-4 text-green-600" />
+                                            <span className="font-medium">Tasks</span>
+                                        </div>
+                                        <div className="text-gray-600">{stats.completedTasks}/{stats.totalTasks} completed</div>
+                                    </div>
+                                    <div className="bg-gray-50 rounded-lg p-3">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <BrainCircuit className="w-4 h-4 text-purple-600" />
+                                            <span className="font-medium">Skills</span>
+                                        </div>
+                                        <div className="text-gray-600">{stats.skillsCount} tracked</div>
+                                    </div>
+                                    <div className="bg-gray-50 rounded-lg p-3">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <ImagePlus className="w-4 h-4 text-orange-600" />
+                                            <span className="font-medium">Projects</span>
+                                        </div>
+                                        <div className="text-gray-600">{stats.projectsCount} created</div>
+                                    </div>
+                                    <div className="bg-gray-50 rounded-lg p-3">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <CalendarDays className="w-4 h-4 text-blue-600" />
+                                            <span className="font-medium">Logs</span>
+                                        </div>
+                                        <div className="text-gray-600">{stats.logsCount} entries</div>
+                                    </div>
+                                </div>
+
+                                {/* Action Indicator */}
+                                <div className="mt-4 pt-3 border-t border-gray-200">
+                                    <div className="flex items-center justify-between text-sm text-gray-500">
+                                        <span>Click to view details</span>
+                                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <span>View Dashboard</span>
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
                             </Card>
                          )
                     })}
                 </div>
+
+                {/* Empty State */}
+                {(!allStudentsData || allStudentsData.length === 0) && (
+                    <div className="text-center py-12">
+                        <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">No Students Yet</h3>
+                        <p className="text-gray-500">Students will appear here once they sign up and start using the Learning Journal.</p>
+                    </div>
+                )}
             </main>
         </div>
     )
@@ -678,7 +895,12 @@ const WorkbookContainer = ({ user, userData, onUpdate, onToggleTask, onSignOut, 
         'Reflection': { icon: <MessageSquare className="w-4 h-4" />, component: <ReflectionSheet userData={userData} onUpdate={onUpdate} isReadOnly={isReadOnly || user.email === TEACHER_EMAIL} /> },
     };
 
-    if (!userData) return <LoadingSpinner />;
+    if (!userData) {
+        console.log('WorkbookContainer: userData is null/undefined');
+        return <LoadingSpinner />;
+    }
+
+    console.log('WorkbookContainer: userData received:', userData);
 
     return (
         <div className="bg-gray-100 min-h-screen font-sans">
@@ -760,10 +982,20 @@ function App() {
             return;
         }
         console.log("Initializing Firebase with config:", firebaseConfig);
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        setFirebaseServices({ auth, db });
+        try {
+            firebase.initializeApp(firebaseConfig);
+            const auth = firebase.auth();
+            const db = firebase.firestore();
+            
+            // Configure Firestore settings to avoid CORS issues
+            db.settings({
+                experimentalForceLongPolling: true // Use long polling instead of WebChannel transport
+            });
+            
+            setFirebaseServices({ auth, db });
+        } catch (error) {
+            console.error("Firebase initialization error:", error);
+        }
     }, []);
 
     // Handle Authentication State Change
@@ -872,12 +1104,17 @@ function App() {
     }
 
     if (userRole === 'teacher') {
+        console.log('Teacher mode, selectedStudent:', selectedStudent);
         if (selectedStudent) {
+             console.log('Rendering WorkbookContainer for student:', selectedStudent.displayName);
              return <WorkbookContainer 
                 user={user}
                 userData={selectedStudent}
                 isReadOnly={true}
-                onBack={() => setSelectedStudent(null)}
+                onBack={() => {
+                    console.log('Back button clicked, clearing selectedStudent');
+                    setSelectedStudent(null);
+                }}
                 // Teacher can only update the feedback part of reflection
                 onUpdate={(key, value) => {
                     if (key === 'reflection') {
@@ -888,7 +1125,11 @@ function App() {
                 onSignOut={handleSignOut}
             />
         }
-        return <TeacherDashboard allStudentsData={allStudentsData} onSelectStudent={setSelectedStudent} onSignOut={handleSignOut} />
+        console.log('Rendering TeacherDashboard with students:', allStudentsData.length);
+        return <TeacherDashboard allStudentsData={allStudentsData} onSelectStudent={(student) => {
+            console.log('Student selected:', student.displayName);
+            setSelectedStudent(student);
+        }} onSignOut={handleSignOut} />
     }
 
     // Default is student view
