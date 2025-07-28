@@ -124,7 +124,7 @@ const Bar = ({ data, options }) => {
 const firebase = window.firebase;
 
 // --- CONSTANTS & CONFIG ---
-const TEACHER_EMAIL = "gronzon31@gmail.com";
+const TEACHER_EMAIL = window.__ENV__?.TEACHER_EMAIL || "teacher@example.com";
 
 const SKILLS_LIST = ["Git & GitHub", "SQL & Databases", "HTML", "CSS", "JavaScript", "Python", "Web APIs (REST)", "React", "Docker", "Testing", "Security"];
 const CONFIDENCE_LEVELS = ["Not Started", "Beginner", "Intermediate", "Advanced", "Expert"];

@@ -39,7 +39,8 @@ if [ ! -z "$FIREBASE_API_KEY" ]; then
             FIREBASE_STORAGE_BUCKET: "'"$FIREBASE_STORAGE_BUCKET"'",\
             FIREBASE_MESSAGING_SENDER_ID: "'"$FIREBASE_MESSAGING_SENDER_ID"'",\
             FIREBASE_APP_ID: "'"$FIREBASE_APP_ID"'",\
-            FIREBASE_MEASUREMENT_ID: "'"$FIREBASE_MEASUREMENT_ID"'"\
+            FIREBASE_MEASUREMENT_ID: "'"$FIREBASE_MEASUREMENT_ID"'",\
+            TEACHER_EMAIL: "'"$TEACHER_EMAIL"'"\
         };|' public/index.html
     else
         # Linux
@@ -51,7 +52,8 @@ if [ ! -z "$FIREBASE_API_KEY" ]; then
             FIREBASE_STORAGE_BUCKET: "'"$FIREBASE_STORAGE_BUCKET"'",\
             FIREBASE_MESSAGING_SENDER_ID: "'"$FIREBASE_MESSAGING_SENDER_ID"'",\
             FIREBASE_APP_ID: "'"$FIREBASE_APP_ID"'",\
-            FIREBASE_MEASUREMENT_ID: "'"$FIREBASE_MEASUREMENT_ID"'"\
+            FIREBASE_MEASUREMENT_ID: "'"$FIREBASE_MEASUREMENT_ID"'",\
+            TEACHER_EMAIL: "'"$TEACHER_EMAIL"'"\
         };|' public/index.html
     fi
 else

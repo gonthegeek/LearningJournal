@@ -104,6 +104,7 @@ artifacts/
    FIREBASE_MESSAGING_SENDER_ID=your_sender_id
    FIREBASE_APP_ID=your_app_id
    FIREBASE_MEASUREMENT_ID=your_measurement_id
+   TEACHER_EMAIL=teacher@yourdomain.com
    ```
 
 ### Local Development
@@ -137,9 +138,9 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == userId;
       
       // Teachers can read all student data and update reflection feedback
-      allow read, list: if request.auth != null && request.auth.token.email == "gronzon31@gmail.com";
+      allow read, list: if request.auth != null && request.auth.token.email == "teacher@yourdomain.com";
       allow update: if request.auth != null && 
-                       request.auth.token.email == "gronzon31@gmail.com" &&
+                       request.auth.token.email == "teacher@yourdomain.com" &&
                        resource.data.keys().hasAny(['reflection']) &&
                        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reflection']);
     }
@@ -162,6 +163,7 @@ The project includes automated deployment via GitHub Actions:
    FIREBASE_MESSAGING_SENDER_ID
    FIREBASE_APP_ID
    FIREBASE_MEASUREMENT_ID
+   TEACHER_EMAIL
    FIREBASE_SERVICE_ACCOUNT_LEARNINGJOURNAL_27009
    ```
 
@@ -189,7 +191,7 @@ firebase deploy
 7. **Write reflections** and receive teacher feedback
 
 ### For Teachers
-1. **Login** with teacher credentials (gronzon31@gmail.com)
+1. **Login** with teacher credentials (teacher@yourdomain.com)
 2. **View student overview** on the teacher dashboard
 3. **Sort students** by name, progress, or activity
 4. **Click student cards** to view detailed individual progress
@@ -330,7 +332,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 For support, feature requests, or bug reports:
 
 - **GitHub Issues**: [Create an issue](https://github.com/gonthegeek/LearningJournal/issues)
-- **Email**: gonzaloronzon@gmail.com
 - **Documentation**: Check this README and inline code comments
 
 ---
