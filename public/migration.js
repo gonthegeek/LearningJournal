@@ -350,7 +350,7 @@ window.runMigration = async function(db) {
                 };
 
                 // Write the updated data back to Firestore
-                await usersCollectionRef.doc(userId).set(updatedData);
+                await usersCollectionRef.doc(userId).set(updatedData, { merge: true });
                 console.log(`✅ Successfully migrated user: ${userData.displayName}`);
                 successCount++;
             } catch (error) {

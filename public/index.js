@@ -41,7 +41,9 @@ const createLucideIcon = (iconName) => {
             'arrow-left': '←',
             'graduation-cap': '🎓',
             'external-link': '🔗',
-            'plus': '+'
+            'plus': '+',
+            'copy': '📋',
+            'search': '🔍'
         };
         
         const fallback = iconMap[iconName] || '?';
@@ -89,6 +91,8 @@ const ArrowLeft = createLucideIcon('arrow-left');
 const GraduationCap = createLucideIcon('graduation-cap');
 const ExternalLink = createLucideIcon('external-link');
 const Plus = createLucideIcon('plus');
+const Copy = createLucideIcon('copy');
+const Search = createLucideIcon('search');
 
 // Custom Bar Chart Component using Chart.js
 const Bar = ({ data, options }) => {
@@ -164,82 +168,443 @@ const COURSES_LIST = [
     { name: "Learning Personal Branding (2018)", link: "https://www.linkedin.com/learning/learning-personal-branding-2018" },
 ];
 
+const AI_PROMPT_TEMPLATES = {
+    'master-prompt': {
+        title: 'Master Prompt (Use This First)',
+        category: 'Foundation',
+        description: 'The main prompt that establishes your learning context and background',
+        template: `ROLE: You are an expert programming tutor specializing in teaching broadcast engineers.
+
+STUDENT CONTEXT:
+- I'm a broadcast engineer with [X years] experience in [TV/Radio/Streaming/etc.]
+- I work with equipment like [list your familiar equipment]
+- I'm learning programming for the first time through a 24-week structured plan
+- I'm currently in Week [X]: [Week Topic]
+- I have [X minutes/hours] for this learning session
+- I prefer explanations using broadcast equipment analogies
+
+LEARNING APPROACH:
+- Explain concepts step-by-step using broadcast analogies
+- Ask me to explain back what I learned before moving forward
+- Provide simple examples first, then build complexity
+- Help me understand WHY something works, not just HOW
+- Connect programming concepts to broadcast engineering tasks I already do
+- Check my understanding with questions before proceeding
+
+CURRENT CHALLENGE:
+[Describe what you're trying to learn or solve]
+[Share any specific errors or confusion points]
+[Include relevant code if applicable]
+
+Please help me understand this concept thoroughly using broadcast engineering examples I can relate to.`
+    },
+    'course-evaluation': {
+        title: 'Course Evaluation',
+        category: 'Learning',
+        description: 'Evaluate if a course is right for your level and background',
+        template: `I'm considering "[COURSE NAME]" for Week [X] of my programming learning.
+
+My background: [X years] broadcast engineering with [equipment you work with]
+My concerns: [too advanced/too basic/too long/not relevant enough]
+Available time: [X hours over X days]
+
+Help me evaluate:
+1. Is this course appropriate for my experience level?
+2. Are there easier/better alternatives for broadcast engineers?
+3. What should I focus on most in this course?
+4. How does this content relate to broadcast engineering?
+5. Should I supplement with additional resources?
+
+Find me the perfect learning path for my broadcast engineering background.`
+    },
+    'concept-explanation': {
+        title: 'Concept Explanation',
+        category: 'Learning',
+        description: 'Get complex programming concepts explained with broadcast analogies',
+        template: `You are my programming tutor specializing in broadcast engineering analogies.
+
+I'm learning about [CONCEPT/TOPIC] and I'm confused about [SPECIFIC CONFUSION].
+
+My broadcast background: [years] with [equipment types]
+My current understanding: [what you think you know]
+What's confusing me: [specific points of confusion]
+
+Please:
+1. Explain this concept using broadcast equipment I know
+2. Give me a step-by-step breakdown
+3. Provide a simple example first
+4. Ask me to explain it back to check my understanding
+5. Give me practical ways to apply this in programming
+
+Use analogies from broadcast engineering to help me understand.`
+    },
+    'debugging-help': {
+        title: 'Debugging & Error Help',
+        category: 'Problem Solving',
+        description: 'Get help troubleshooting code with broadcast engineering approach',
+        template: `You are my senior programming mentor with broadcast engineering expertise.
+
+PROBLEM: [Describe what you're trying to do]
+ERROR MESSAGE: [Copy exact error message]
+MY CODE: [Paste the problematic code]
+
+My broadcast background: [equipment you work with]
+What I expected: [what should happen]
+What's happening: [what actually happens]
+
+Please help me debug this like we troubleshoot broadcast equipment:
+1. What's the most likely cause?
+2. How do I isolate the problem?
+3. What should I check first?
+4. Explain the solution using broadcast troubleshooting logic
+5. How do I prevent this in the future?
+
+Walk me through the debugging process step-by-step.`
+    },
+    'project-planning': {
+        title: 'Project Planning',
+        category: 'Planning',
+        description: 'Plan programming projects using broadcast project management approaches',
+        template: `You are my programming project manager with broadcast engineering experience.
+
+PROJECT GOAL: [What you want to build]
+MY SKILLS: Currently in Week [X], comfortable with [list skills]
+TIME AVAILABLE: [hours/days available]
+BROADCAST CONNECTION: [how this relates to broadcast work]
+
+Help me plan this project like we plan broadcast installations:
+1. Break down the project into phases
+2. Identify dependencies and requirements
+3. Suggest what to learn/research first
+4. Create a timeline with milestones
+5. Identify potential risks and mitigation
+6. Recommend tools and resources
+
+Make this manageable for someone with broadcast engineering experience but new to programming.`
+    },
+    'code-review': {
+        title: 'Code Review',
+        category: 'Problem Solving',
+        description: 'Get feedback on your code with broadcast engineering perspective',
+        template: `You are my senior programmer and broadcast engineering mentor.
+
+PROJECT: [Brief description of what this code does]
+MY CODE: [Paste your code here]
+
+My experience level: Week [X] of learning, broadcast engineer
+What I'm trying to achieve: [goal]
+My concerns: [what you're unsure about]
+
+Please review my code like a senior engineer reviews broadcast system designs:
+1. Does this code accomplish the goal?
+2. Are there any obvious problems or bugs?
+3. How could this be improved?
+4. What best practices am I missing?
+5. How does this compare to professional standards?
+6. What should I learn next to improve?
+
+Be encouraging but honest - I want to learn proper programming practices.`
+    },
+    'career-guidance': {
+        title: 'Career Guidance',
+        category: 'Career',
+        description: 'Get advice on transitioning from broadcast to programming roles',
+        template: `You are a career counselor specializing in broadcast engineers transitioning to programming.
+
+MY SITUATION:
+- [X years] broadcast engineering experience
+- Currently in Week [X] of programming learning
+- Work with: [equipment/technologies]
+- Interested in: [specific programming areas]
+- Career goal: [what you want to achieve]
+
+QUESTIONS:
+1. What programming roles best match my broadcast background?
+2. How do I highlight my transferable skills?
+3. What should I focus on learning next for my goals?
+4. How do I build a portfolio that shows my unique perspective?
+5. What companies value broadcast + programming experience?
+6. How do I network in the programming community?
+
+Help me create a strategic career transition plan.`
+    },
+    'learning-strategy': {
+        title: 'Learning Strategy',
+        category: 'Planning',
+        description: 'Optimize your learning approach and overcome obstacles',
+        template: `You are my learning coach specialized in adult education and technical training.
+
+MY LEARNING SITUATION:
+- Week [X] of 24-week programming plan
+- Background: [years] broadcast engineering
+- Current challenge: [what's difficult]
+- Time constraints: [available time]
+- Learning style: [how you learn best]
+
+CHALLENGES I'M FACING:
+[List specific difficulties]
+
+HELP ME:
+1. Adjust my learning strategy for these challenges
+2. Find ways to connect new concepts to broadcast knowledge
+3. Create a more effective daily routine
+4. Overcome specific mental blocks
+5. Stay motivated when things get difficult
+6. Balance learning with work responsibilities
+
+Give me practical, actionable advice for becoming a more effective learner.`
+    },
+    'interview-prep': {
+        title: 'Interview Preparation',
+        category: 'Career',
+        description: 'Prepare for programming job interviews leveraging broadcast experience',
+        template: `You are my interview coach specializing in career transitions to programming.
+
+INTERVIEW DETAILS:
+- Position: [job title]
+- Company: [company name/type]
+- My background: [years] broadcast engineering
+- Programming level: Week [X] of learning
+- Interview type: [technical/behavioral/both]
+
+PREPARATION HELP:
+1. How do I explain my transition from broadcast to programming?
+2. What technical questions might they ask at my level?
+3. How do I showcase problem-solving from broadcast work?
+4. What projects best demonstrate my unique perspective?
+5. How do I address gaps in traditional programming education?
+6. What questions should I ask them about the role?
+
+Help me prepare responses that highlight my broadcast experience as an asset.`
+    }
+};
+
+const AI_PROMPT_EXAMPLES = {
+    'career-transition-example': {
+        week: 0,
+        title: 'Career Transition Planning',
+        situation: 'Planning transition to programming roles',
+        example: `You are a career counselor specializing in broadcast engineers transitioning to programming.
+
+MY SITUATION:
+- 10 years broadcast engineering experience
+- Currently in Week 0 of programming learning
+- Work with: Video routers, automation systems, SNMP monitoring, RF systems
+- Interested in: DevOps, system monitoring, automation tools
+- Career goal: Transition to a role that combines broadcast knowledge with programming
+
+QUESTIONS:
+1. What programming roles best match my broadcast background?
+2. How do I highlight my transferable skills?
+3. What should I focus on learning next for my goals?
+4. How do I build a portfolio that shows my unique perspective?
+5. What companies value broadcast + programming experience?
+6. How do I network in the programming community?
+
+Help me create a strategic career transition plan that leverages my broadcast engineering expertise.`
+    },
+    'week1-git-example': {
+        week: 3,
+        title: 'Git & Version Control for Broadcast Engineers',
+        situation: 'Learning Git in Week 3',
+        example: `ROLE: You are an expert programming tutor specializing in teaching broadcast engineers.
+
+STUDENT CONTEXT:
+- I'm a broadcast engineer with 8 years experience in TV broadcast operations
+- I work with equipment like video routers, audio mixers, transmitters, automation systems, and master control switchers
+- I'm learning programming for the first time through a 24-week structured plan
+- I'm currently in Week 1: Version Control - Project Tracking Like Equipment Logs
+- I have 15-20 minutes for this learning session
+- I prefer explanations using broadcast equipment analogies
+
+LEARNING APPROACH:
+- Explain concepts step-by-step using broadcast analogies
+- Ask me to explain back what I learned before moving forward
+- Provide simple examples first, then build complexity
+- Help me understand WHY something works, not just HOW
+- Connect programming concepts to broadcast engineering tasks I already do
+- Check my understanding with questions before proceeding
+
+CURRENT CHALLENGE:
+I'm considering "Learning Git and GitHub" on LinkedIn Learning for Week 1. Our facility tracks equipment changes in Excel spreadsheets and email chains, which creates confusion when multiple engineers work on the same systems. How does Git solve these problems better than our current methods?
+
+Please help me understand this concept thoroughly using broadcast engineering examples I can relate to.`
+    },
+    'week2-sql-example': {
+        week: 4,
+        title: 'Database Concepts vs Equipment Inventory',
+        situation: 'Learning SQL basics in Week 4',
+        example: `I'm considering "SQL for Non-Programmers" for Week 4 of my programming learning.
+
+My background: 8 years broadcast engineering with video routers, audio mixers, transmitters, currently use Excel for equipment inventory tracking
+My concerns: I'm comfortable with Excel - not sure why I need databases for equipment management
+Available time: 30 minutes spread across the week
+
+Help me evaluate:
+1. Is this course appropriate for my experience level?
+2. Are there easier/better alternatives for broadcast engineers?
+3. What should I focus on most in this course?
+4. How does this content relate to broadcast engineering?
+5. Should I supplement with additional resources?
+
+Find me the perfect learning path for my broadcast engineering background.`
+    },
+    'debugging-javascript': {
+        week: 6,
+        title: 'JavaScript Debugging Help',
+        situation: 'Troubleshooting JavaScript code',
+        example: `You are my senior programming mentor with broadcast engineering expertise.
+
+PROBLEM: I'm trying to create a simple equipment status checker
+ERROR MESSAGE: "Cannot read property 'status' of undefined"
+MY CODE: 
+const equipment = [
+  { name: "Router", status: "online" },
+  { name: "Mixer", status: "offline" }
+];
+
+function checkStatus(deviceName) {
+  const device = equipment.find(item => item.name === deviceName);
+  return device.status; // Error happens here
+}
+
+console.log(checkStatus("Transmitter"));
+
+My broadcast background: Video routing systems and audio mixers
+What I expected: Should return status or show error gracefully
+What's happening: Code crashes with undefined error
+
+Please help me debug this like we troubleshoot broadcast equipment:
+1. What's the most likely cause?
+2. How do I isolate the problem?
+3. What should I check first?
+4. Explain the solution using broadcast troubleshooting logic
+5. How do I prevent this in the future?
+
+Walk me through the debugging process step-by-step.`
+    },
+    'week5-foundations-example': {
+        week: 5,
+        title: 'Understanding Programming Foundations',
+        situation: 'Learning programming fundamentals in Week 5',
+        example: `You are my programming tutor specializing in broadcast engineering analogies.
+
+I'm learning about programming fundamentals and I'm confused about how variables and functions work together.
+
+My broadcast background: 8 years with video routers, audio mixers, and automation systems
+My current understanding: Variables store data like equipment settings, but I'm unclear how functions use them
+What's confusing me: When do I use functions vs just setting variables directly?
+
+Please:
+1. Explain this concept using broadcast equipment I know
+2. Give me a step-by-step breakdown
+3. Provide a simple example first
+4. Ask me to explain it back to check my understanding
+5. Give me practical ways to apply this in programming
+
+Use analogies from broadcast engineering to help me understand.`
+    },
+    'week8-python-example': {
+        week: 8,
+        title: 'Python for Equipment Controllers',
+        situation: 'Learning Python basics for automation',
+        example: `You are my senior programming mentor with broadcast engineering expertise.
+
+PROBLEM: I'm trying to learn Python to create equipment monitoring scripts
+MY GOAL: Write a script that checks equipment status like our current manual processes
+MY CODE: (I'm just starting - no code yet)
+
+My broadcast background: Work with routers, mixers, transmitters - familiar with SNMP monitoring
+What I want to achieve: Automate equipment health checks we do manually
+My concerns: Python syntax looks complex compared to the simple scripts I've seen
+
+Please help me learn Python like I learned broadcast automation:
+1. Start with the most basic concepts I need
+2. Show me how Python scripts are like equipment macros
+3. Give me a simple first project that relates to equipment monitoring
+4. Explain Python syntax using broadcast control examples
+5. What should I focus on first to build useful tools?
+
+Make this practical for someone who thinks in terms of signal flow and equipment control.`
+    }
+};
+
 const createInitialUserData = (displayName) => {
     const initialLearningPlanData = [
         { id: 0, title: "Career Essentials – Professional Programming Foundations", phase: "Foundation", successGoal: "Understand professional programming landscape for broadcast", tasks: [
-            { text: "Mon: Course 1 – Introduction module (Career overview ~25m)", link: "https://www.linkedin.com/learning/paths/career-essentials-in-software-development-by-microsoft-and-linkedin", completed: false },
-            { text: "Mon: AI Prompt – How do these career skills apply to broadcast engineers?", completed: false },
-            { text: "Tue: Course 1 – Skills and tools module (~25m)", link: "https://www.linkedin.com/learning/paths/career-essentials-in-software-development-by-microsoft-and-linkedin", completed: false },
-            { text: "Tue: AI Prompt – Relate programming career skills to broadcast engineering", completed: false },
-            { text: "Wed: Course 1 – Industry perspectives module (~25m)", link: "https://www.linkedin.com/learning/paths/career-essentials-in-software-development-by-microsoft-and-linkedin", completed: false },
-            { text: "Wed: AI Prompt – Apply programming skills in broadcast environments", completed: false },
-            { text: "Thu: Course 1 – Remaining sections (~25m)", link: "https://www.linkedin.com/learning/paths/career-essentials-in-software-development-by-microsoft-and-linkedin", completed: false },
-            { text: "Thu: AI Discussion – Professional development plan (broadcast focus)", completed: false },
-            { text: "Fri: Finish Course 1 & create learning plan for remaining courses", completed: false }
+            { text: " Course 1 – Introduction module (Career overview ~25m)", link: "https://www.linkedin.com/learning/paths/career-essentials-in-software-development-by-microsoft-and-linkedin", completed: false },
+            { text: " AI Prompt – How do these career skills apply to broadcast engineers?", completed: false },
+            { text: " Course 1 – Skills and tools module (~25m)", link: "https://www.linkedin.com/learning/paths/career-essentials-in-software-development-by-microsoft-and-linkedin", completed: false },
+            { text: " AI Prompt – Relate programming career skills to broadcast engineering", completed: false },
+            { text: " Course 1 – Industry perspectives module (~25m)", link: "https://www.linkedin.com/learning/paths/career-essentials-in-software-development-by-microsoft-and-linkedin", completed: false },
+            { text: " AI Prompt – Apply programming skills in broadcast environments", completed: false },
+            { text: " Course 1 – Remaining sections (~25m)", link: "https://www.linkedin.com/learning/paths/career-essentials-in-software-development-by-microsoft-and-linkedin", completed: false },
+            { text: " AI Discussion – Professional development plan (broadcast focus)", completed: false },
+            { text: " Finish Course 1 & create learning plan for remaining courses", completed: false }
         ]},
         { id: 1, title: "Programming Foundations – Core Concepts", phase: "Foundation", successGoal: "Master core concepts w/ broadcast context", tasks: [
-            { text: "Mon: Course 2 – Fundamentals intro + basics (~25m)", link: "https://www.linkedin.com/learning/programming-foundations-fundamentals", completed: false },
-            { text: "Mon: AI – Connect programming fundamentals to broadcast system logic", completed: false },
-            { text: "Tue: Course 2 – Variables & data types (~25m)", link: "https://www.linkedin.com/learning/programming-foundations-fundamentals", completed: false },
-            { text: "Tue: AI – Relate variables to equipment parameters", completed: false },
-            { text: "Wed: Course 2 – Functions & methods (~25m)", link: "https://www.linkedin.com/learning/programming-foundations-fundamentals", completed: false },
-            { text: "Wed: AI – Functions like equipment control procedures", completed: false },
-            { text: "Thu: Course 2 – Conditionals & modular programming (~25m)", link: "https://www.linkedin.com/learning/programming-foundations-fundamentals", completed: false },
-            { text: "Thu: AI – Apply conditional logic to automation scenarios", completed: false },
-            { text: "Fri: Course 2 – Debugging & error handling (~25m)", link: "https://www.linkedin.com/learning/programming-foundations-fundamentals", completed: false },
-            { text: "Fri: AI – Compare debugging to equipment troubleshooting", completed: false }
+            { text: " Course 2 – Fundamentals intro + basics (~25m)", link: "https://www.linkedin.com/learning/programming-foundations-fundamentals", completed: false },
+            { text: " AI Prompt – Connect programming fundamentals to broadcast system logic", completed: false },
+            { text: " Course 2 – Variables & data types (~25m)", link: "https://www.linkedin.com/learning/programming-foundations-fundamentals", completed: false },
+            { text: " AI Prompt – Relate variables to equipment parameters", completed: false },
+            { text: " Course 2 – Functions & methods (~25m)", link: "https://www.linkedin.com/learning/programming-foundations-fundamentals", completed: false },
+            { text: " AI Prompt – Functions like equipment control procedures", completed: false },
+            { text: " Course 2 – Conditionals & modular programming (~25m)", link: "https://www.linkedin.com/learning/programming-foundations-fundamentals", completed: false },
+            { text: " AI Prompt – Apply conditional logic to automation scenarios", completed: false },
+            { text: " Course 2 – Debugging & error handling (~25m)", link: "https://www.linkedin.com/learning/programming-foundations-fundamentals", completed: false },
+            { text: " AI Prompt – Compare debugging to equipment troubleshooting", completed: false }
         ]},
         { id: 2, title: "Advanced Foundations – Professional Practices", phase: "Foundation", successGoal: "Certificate complete + applied insights", tasks: [
-            { text: "Mon: Course 3 – Collections (~25m)", link: "https://www.linkedin.com/learning/programming-foundations-beyond-the-fundamentals", completed: false },
-            { text: "Mon: AI – Collections vs equipment inventories", completed: false },
-            { text: "Tue: Course 3 – External code & libraries (~25m)", link: "https://www.linkedin.com/learning/programming-foundations-beyond-the-fundamentals", completed: false },
-            { text: "Tue: AI – Libraries vs integrating 3rd-party equipment", completed: false },
-            { text: "Wed: Course 3 – Advanced debugging & error handling (~25m)", link: "https://www.linkedin.com/learning/programming-foundations-beyond-the-fundamentals", completed: false },
-            { text: "Wed: AI – Advanced troubleshooting techniques", completed: false },
-            { text: "Thu: Course 3 – Planning & documenting code (~25m)", link: "https://www.linkedin.com/learning/programming-foundations-beyond-the-fundamentals", completed: false },
-            { text: "Thu: AI – Documentation practices vs broadcast engineering", completed: false },
-            { text: "Fri: Complete certificate & create insights doc (repo)", completed: false },
-            { text: "Fri: AI – Review understanding of professional foundations", completed: false }
+            { text: " Course 3 – Collections (~25m)", link: "https://www.linkedin.com/learning/programming-foundations-beyond-the-fundamentals", completed: false },
+            { text: " AI Prompt – Collections vs equipment inventories", completed: false },
+            { text: " Course 3 – External code & libraries (~25m)", link: "https://www.linkedin.com/learning/programming-foundations-beyond-the-fundamentals", completed: false },
+            { text: " AI Prompt – Libraries vs integrating 3rd-party equipment", completed: false },
+            { text: " Course 3 – Advanced debugging & error handling (~25m)", link: "https://www.linkedin.com/learning/programming-foundations-beyond-the-fundamentals", completed: false },
+            { text: " AI Prompt – Advanced troubleshooting techniques", completed: false },
+            { text: " Course 3 – Planning & documenting code (~25m)", link: "https://www.linkedin.com/learning/programming-foundations-beyond-the-fundamentals", completed: false },
+            { text: " AI Prompt – Documentation practices vs broadcast engineering", completed: false },
+            { text: " Complete certificate & create insights doc (repo)", completed: false },
+            { text: " AI Prompt – Review understanding of professional foundations", completed: false }
         ]},
         { id: 3, title: "Version Control – Project Tracking like Equipment Logs", phase: "Foundation", successGoal: "Track project like equipment docs", tasks: [
-            { text: "Mon: Watch Git course intro sections (~30m)", link: "https://www.linkedin.com/learning/learning-git-and-github-14213624", completed: false },
-            { text: "Mon: AI – Explain Git like broadcast change logs", completed: false },
-            { text: "Tue: Repo: Create learning branch feature/learning-[name] & add to LEARNERS.md", completed: false },
-            { text: "Wed: Watch 'Working with repositories' module", link: "https://www.linkedin.com/learning/learning-git-and-github-14213624", completed: false },
-            { text: "Wed: AI – Repos vs equipment documentation", completed: false },
-            { text: "Thu: Repo: Add new device type to shared/core/device_types.py", completed: false },
-            { text: "Fri: Repo: Create logs/learning/week1-[name].md (what you learned)", completed: false }
+            { text: " Watch Git course intro sections (~30m)", link: "https://www.linkedin.com/learning/learning-git-and-github-14213624", completed: false },
+            { text: " AI Prompt – Explain Git like broadcast change logs", completed: false },
+            { text: " Repo: Create learning branch feature/learning-[name] & add to LEARNERS.md", completed: false },
+            { text: " Watch 'Working with repositories' module", link: "https://www.linkedin.com/learning/learning-git-and-github-14213624", completed: false },
+            { text: " AI Prompt – Repos vs equipment documentation", completed: false },
+            { text: " Repo: Add new device type to shared/core/device_types.py", completed: false },
+            { text: " Repo: Create logs/learning/week1-[name].md (what you learned)", completed: false }
         ]},
         { id: 4, title: "Data & Databases – Why DBs Beat Excel", phase: "Foundation", successGoal: "Understand DB advantage for equipment mgmt", tasks: [
-            { text: "Mon: Watch 'Database fundamentals' module", link: "https://www.linkedin.com/learning/sql-for-non-programmers", completed: false },
-            { text: "Mon: AI – Databases vs equipment inventory systems", completed: false },
-            { text: "Tue: Repo: Explore models in device-service & document 3 fields", completed: false },
-            { text: "Tue: FreeCodeCamp: Start Bash boilerplate (optional)", link: "https://www.freecodecamp.org/learn/relational-database/", completed: false },
-            { text: "Wed: Watch 'Basic SQL queries' module", link: "https://www.linkedin.com/learning/sql-for-non-programmers", completed: false },
-            { text: "Wed: AI – Translate SQL queries to equipment searches", completed: false },
-            { text: "Wed: FreeCodeCamp: Student Database project (optional)", link: "https://www.freecodecamp.org/learn/relational-database/", completed: false },
-            { text: "Thu: Repo: Add a new device via UI & inspect API call", completed: false },
-            { text: "Fri: Repo: Create database-notes-[name].md (DB vs Excel)", completed: false }
+            { text: " Watch 'Database fundamentals' module", link: "https://www.linkedin.com/learning/sql-for-non-programmers", completed: false },
+            { text: " AI Prompt – Databases vs equipment inventory systems", completed: false },
+            { text: " Repo: Explore models in device-service & document 3 fields", completed: false },
+            { text: " FreeCodeCamp: Start Bash boilerplate (optional)", link: "https://www.freecodecamp.org/learn/relational-database/", completed: false },
+            { text: " Watch 'Basic SQL queries' module", link: "https://www.linkedin.com/learning/sql-for-non-programmers", completed: false },
+            { text: " AI Prompt – Translate SQL queries to equipment searches", completed: false },
+            { text: " FreeCodeCamp: Student Database project (optional)", link: "https://www.freecodecamp.org/learn/relational-database/", completed: false },
+            { text: " Repo: Add a new device via UI & inspect API call", completed: false },
+            { text: " Repo: Create database-notes-[name].md (DB vs Excel)", completed: false }
         ]},
         { id: 5, title: "Web Interfaces – Equipment Monitoring Pages", phase: "Foundation", successGoal: "Display equipment info in UI", tasks: [
-            { text: "Mon: HTML basics modules", link: "https://www.linkedin.com/learning/html-css-and-javascript-building-the-web", completed: false },
-            { text: "Mon: AI – HTML vs signal flow diagrams", completed: false },
-            { text: "Tue: Repo: Modify Dashboard welcome message", completed: false },
-            { text: "Tue: FreeCodeCamp HTML Cat Photo App (optional)", link: "https://www.freecodecamp.org/learn/2022/responsive-web-design/", completed: false },
-            { text: "Wed: CSS styling modules", link: "https://www.linkedin.com/learning/html-css-and-javascript-building-the-web", completed: false },
-            { text: "Wed: AI – CSS like equipment front panels", completed: false },
-            { text: "Thu: Repo: Update header color (branding)", completed: false },
-            { text: "Thu: FreeCodeCamp Cafe Menu (optional)", link: "https://www.freecodecamp.org/learn/2022/responsive-web-design/", completed: false },
-            { text: "Fri: Repo: Create MyEquipmentList React component", completed: false }
+            { text: " HTML basics modules", link: "https://www.linkedin.com/learning/html-css-and-javascript-building-the-web", completed: false },
+            { text: " AI Prompt – HTML vs signal flow diagrams", completed: false },
+            { text: " Repo: Modify Dashboard welcome message", completed: false },
+            { text: " FreeCodeCamp HTML Cat Photo App (optional)", link: "https://www.freecodecamp.org/learn/2022/responsive-web-design/", completed: false },
+            { text: " CSS styling modules", link: "https://www.linkedin.com/learning/html-css-and-javascript-building-the-web", completed: false },
+            { text: " AI Prompt – CSS like equipment front panels", completed: false },
+            { text: " Repo: Update header color (branding)", completed: false },
+            { text: " FreeCodeCamp Cafe Menu (optional)", link: "https://www.freecodecamp.org/learn/2022/responsive-web-design/", completed: false },
+            { text: " Repo: Create MyEquipmentList React component", completed: false }
         ]},
         { id: 6, title: "Programming Logic – If/Then Automation", phase: "Foundation", successGoal: "Apply conditionals to monitoring logic", tasks: [
-            { text: "Mon: JS Essential Training – Variables & data types", link: "https://www.linkedin.com/learning/javascript-essential-training", completed: false },
-            { text: "Mon: AI – Variables vs equipment settings", completed: false },
-            { text: "Tue: Repo: Add equipment variables file (config/equipment.js)", completed: false },
-            { text: "Wed: JS – Conditional statements module", link: "https://www.linkedin.com/learning/javascript-essential-training", completed: false },
-            { text: "Wed: AI – If/then vs automation logic", completed: false },
-            { text: "Thu: Repo: DeviceStatus.js color logic (R/Y/G)", completed: false },
-            { text: "Fri: Repo: Create alert rules file [name]_rules.py", completed: false }
+            { text: " JS Essential Training – Variables & data types", link: "https://www.linkedin.com/learning/javascript-essential-training", completed: false },
+            { text: " AI Prompt – Variables vs equipment settings", completed: false },
+            { text: " Repo: Add equipment variables file (config/equipment.js)", completed: false },
+            { text: " JS – Conditional statements module", link: "https://www.linkedin.com/learning/javascript-essential-training", completed: false },
+            { text: " AI Prompt – If/then vs automation logic", completed: false },
+            { text: " Repo: DeviceStatus.js color logic (R/Y/G)", completed: false },
+            { text: " Repo: Create alert rules file [name]_rules.py", completed: false }
         ]},
         { id: 7, title: "Break / Consolidate Foundation Skills", phase: "Foundation", successGoal: "Confidence with basics", tasks: [
             { text: "Review confusing concepts with AI", completed: false },
@@ -250,56 +615,56 @@ const createInitialUserData = (displayName) => {
             { text: "Rest & knowledge consolidation", completed: false }
         ]},
         { id: 8, title: "Backend Systems – Equipment Controllers", phase: "Foundation", successGoal: "Understand backend service role", tasks: [
-            { text: "Mon: Python intro modules", link: "https://www.linkedin.com/learning/python-for-non-programmers", completed: false },
-            { text: "Mon: AI – Python scripts vs control software", completed: false },
-            { text: "Tue: Repo: Explore device-service/main.py; add startup print", completed: false },
-            { text: "Wed: Python – Working with data module", link: "https://www.linkedin.com/learning/python-for-non-programmers", completed: false },
-            { text: "Wed: AI – Data handling like controllers", completed: false },
-            { text: "Thu: Repo: Create device check script", completed: false },
-            { text: "Fri: Repo: Add facility equipment to default_devices.py", completed: false }
+            { text: " Python intro modules", link: "https://www.linkedin.com/learning/python-for-non-programmers", completed: false },
+            { text: " AI Prompt – Python scripts vs control software", completed: false },
+            { text: " Repo: Explore device-service/main.py; add startup print", completed: false },
+            { text: " Python – Working with data module", link: "https://www.linkedin.com/learning/python-for-non-programmers", completed: false },
+            { text: " AI Prompt – Data handling like controllers", completed: false },
+            { text: " Repo: Create device check script", completed: false },
+            { text: " Repo: Add facility equipment to default_devices.py", completed: false }
         ]},
         { id: 9, title: "API Communication – Network Protocols", phase: "Foundation", successGoal: "Grasp request-response mechanics", tasks: [
-            { text: "Mon: API fundamentals module", link: "https://www.linkedin.com/learning/introduction-to-web-apis", completed: false },
-            { text: "Mon: AI – APIs vs SNMP/equipment protocols", completed: false },
-            { text: "Tue: Test GET /api/devices (curl/Postman) & document response", completed: false },
-            { text: "Wed: Making API requests module", link: "https://www.linkedin.com/learning/introduction-to-web-apis", completed: false },
-            { text: "Wed: AI – Requests like equipment commands", completed: false },
-            { text: "Thu: Repo: api-test-[name].py to add a device", completed: false },
-            { text: "Fri: Repo: Add custom endpoint routes/custom.py", completed: false }
+            { text: " API fundamentals module", link: "https://www.linkedin.com/learning/introduction-to-web-apis", completed: false },
+            { text: " AI Prompt – APIs vs SNMP/equipment protocols", completed: false },
+            { text: " Test GET /api/devices (curl/Postman) & document response", completed: false },
+            { text: " Making API requests module", link: "https://www.linkedin.com/learning/introduction-to-web-apis", completed: false },
+            { text: " AI Prompt – Requests like equipment commands", completed: false },
+            { text: " Repo: api-test-[name].py to add a device", completed: false },
+            { text: " Repo: Add custom endpoint routes/custom.py", completed: false }
         ]},
         { id: 10, title: "Monitoring Concepts – Health Checks", phase: "Foundation", successGoal: "Link programming to equipment monitoring", tasks: [
-            { text: "Mon: REST principles module", link: "https://www.linkedin.com/learning/learning-rest-apis", completed: false },
-            { text: "Mon: AI – REST vs monitoring protocols", completed: false },
-            { text: "Tue: Repo: Create monitoring checks file", completed: false },
-            { text: "Wed: API responses module", link: "https://www.linkedin.com/learning/learning-rest-apis", completed: false },
-            { text: "Wed: AI – Responses like status reports", completed: false },
-            { text: "Thu: Repo: Add monitoring dashboard widget", completed: false },
-            { text: "Fri: Repo: Document monitoring setup (broadcast analogies)", completed: false }
+            { text: " REST principles module", link: "https://www.linkedin.com/learning/learning-rest-apis", completed: false },
+            { text: " AI Prompt – REST vs monitoring protocols", completed: false },
+            { text: " Repo: Create monitoring checks file", completed: false },
+            { text: " API responses module", link: "https://www.linkedin.com/learning/learning-rest-apis", completed: false },
+            { text: " AI Prompt – Responses like status reports", completed: false },
+            { text: " Repo: Add monitoring dashboard widget", completed: false },
+            { text: " Repo: Document monitoring setup (broadcast analogies)", completed: false }
         ]},
         { id: 11, title: "Data Visualization – Status Dashboards", phase: "Building", successGoal: "Working real-time displays", tasks: [
-            { text: "Mon: Visualization principles module", link: "https://www.linkedin.com/learning/data-visualization-best-practices", completed: false },
-            { text: "Mon: AI – Best ways to visualize equipment data", completed: false },
-            { text: "Tue: Repo: EquipmentChart.js (Chart.js) status distribution", completed: false },
-            { text: "Wed: Dashboard design module", link: "https://www.linkedin.com/learning/data-visualization-best-practices", completed: false },
-            { text: "Wed: Repo: Add color coding to main dashboard", completed: false },
-            { text: "Thu: Repo: Real-time status chart (WebSocket)", completed: false },
-            { text: "Fri: Repo: Add dashboard to navigation", completed: false }
+            { text: " Visualization principles module", link: "https://www.linkedin.com/learning/data-visualization-best-practices", completed: false },
+            { text: " AI Prompt – Best ways to visualize equipment data", completed: false },
+            { text: " Repo: EquipmentChart.js (Chart.js) status distribution", completed: false },
+            { text: " Dashboard design module", link: "https://www.linkedin.com/learning/data-visualization-best-practices", completed: false },
+            { text: " Repo: Add color coding to main dashboard", completed: false },
+            { text: " Repo: Real-time status chart (WebSocket)", completed: false },
+            { text: " Repo: Add dashboard to navigation", completed: false }
         ]},
         { id: 12, title: "Real Features – Complete Monitoring (React)", phase: "Building", successGoal: "First end-to-end monitoring feature", tasks: [
-            { text: "Mon: React components setup module", link: "https://www.linkedin.com/learning/react-js-essential-training-14836121", completed: false },
-            { text: "Mon: Plan feature via GitHub Issues", completed: false },
-            { text: "Tue: Repo: MyEquipmentList with search & filter", completed: false },
-            { text: "Wed: Repo: EquipmentDetails modal (full info)", completed: false },
-            { text: "Thu: Repo: Implement WebSocket real-time updates", completed: false },
-            { text: "Fri: Deploy: Update docker-compose & test", completed: false }
+            { text: " React components setup module", link: "https://www.linkedin.com/learning/react-js-essential-training-14836121", completed: false },
+            { text: " Plan feature via GitHub Issues", completed: false },
+            { text: " Repo: MyEquipmentList with search & filter", completed: false },
+            { text: " Repo: EquipmentDetails modal (full info)", completed: false },
+            { text: " Repo: Implement WebSocket real-time updates", completed: false },
+            { text: " Deploy: Update docker-compose & test", completed: false }
         ]},
         { id: 13, title: "Error Handling – Failure Management", phase: "Building", successGoal: "Robust failure handling", tasks: [
-            { text: "Mon: Error handling strategies module", link: "https://www.linkedin.com/learning/programming-foundations-software-testing-qa", completed: false },
-            { text: "Mon: AI – Equipment failure protocols analogy", completed: false },
-            { text: "Tue: Repo: Add try/catch in devices routes", completed: false },
-            { text: "Wed: Repo: failure_handler.py for offline detection", completed: false },
-            { text: "Thu: Repo: Graceful degradation in DeviceList.js", completed: false },
-            { text: "Fri: Repo: Error logging device/error-handling.log", completed: false }
+            { text: " Error handling strategies module", link: "https://www.linkedin.com/learning/programming-foundations-software-testing-qa", completed: false },
+            { text: " AI Prompt – Equipment failure protocols analogy", completed: false },
+            { text: " Repo: Add try/catch in devices routes", completed: false },
+            { text: " Repo: failure_handler.py for offline detection", completed: false },
+            { text: " Repo: Graceful degradation in DeviceList.js", completed: false },
+            { text: " Repo: Error logging device/error-handling.log", completed: false }
         ]},
         { id: 14, title: "Break – Assess Building Skills", phase: "Building", successGoal: "Confidence with shipped features", tasks: [
             { text: "Review code with AI for improvements", completed: false },
@@ -308,65 +673,65 @@ const createInitialUserData = (displayName) => {
             { text: "Rest & consolidate", completed: false }
         ]},
         { id: 15, title: "User Authentication – Secure Access", phase: "Building", successGoal: "Role-based secure system", tasks: [
-            { text: "Mon: Auth fundamentals module", link: "https://www.linkedin.com/learning/react-authentication-25660373", completed: false },
-            { text: "Mon: AI – Auth like equipment access control", completed: false },
-            { text: "Tue: Repo: Add custom user roles (auth-service)", completed: false },
-            { text: "Wed: Roles & permissions module", link: "https://www.linkedin.com/learning/react-authentication-25660373", completed: false },
-            { text: "Wed: Repo: Implement ProtectedRoute RBAC", completed: false },
-            { text: "Thu: Repo: SecureDeviceControls (modify equipment)", completed: false },
-            { text: "Fri: Repo: access_log.py audit logging", completed: false }
+            { text: " Auth fundamentals module", link: "https://www.linkedin.com/learning/react-authentication-25660373", completed: false },
+            { text: " AI Prompt – Auth like equipment access control", completed: false },
+            { text: " Repo: Add custom user roles (auth-service)", completed: false },
+            { text: " Roles & permissions module", link: "https://www.linkedin.com/learning/react-authentication-25660373", completed: false },
+            { text: " Repo: Implement ProtectedRoute RBAC", completed: false },
+            { text: " Repo: SecureDeviceControls (modify equipment)", completed: false },
+            { text: " Repo: access_log.py audit logging", completed: false }
         ]},
         { id: 16, title: "Advanced APIs – Equipment Integration", phase: "Building", successGoal: "External system connectivity", tasks: [
-            { text: "Mon: Advanced API patterns module", link: "https://www.linkedin.com/learning/learning-rest-apis", completed: false },
-            { text: "Mon: AI – Best practices for equipment integration", completed: false },
-            { text: "Tue: Repo: snipeit_connector.py", completed: false },
-            { text: "Wed: API auth & security module", link: "https://www.linkedin.com/learning/learning-rest-apis", completed: false },
-            { text: "Wed: Repo: sync/device_sync.py bidirectional sync", completed: false },
-            { text: "Thu: Repo: retry_handler.py with retries & backoff", completed: false },
-            { text: "Fri: Repo: external_api_tests integration suite", completed: false }
+            { text: " Advanced API patterns module", link: "https://www.linkedin.com/learning/learning-rest-apis", completed: false },
+            { text: " AI Prompt – Best practices for equipment integration", completed: false },
+            { text: " Repo: snipeit_connector.py", completed: false },
+            { text: " API auth & security module", link: "https://www.linkedin.com/learning/learning-rest-apis", completed: false },
+            { text: " Repo: sync/device_sync.py bidirectional sync", completed: false },
+            { text: " Repo: retry_handler.py with retries & backoff", completed: false },
+            { text: " Repo: external_api_tests integration suite", completed: false }
         ]},
         { id: 17, title: "Performance – Production Monitoring", phase: "Building", successGoal: "Production-ready performance", tasks: [
-            { text: "Mon: DB performance optimization module", link: "https://www.linkedin.com/learning/advanced-python-working-with-databases-22307421", completed: false },
-            { text: "Mon: AI – Optimization for equipment monitoring", completed: false },
-            { text: "Tue: Repo: query_profiler.py", completed: false },
-            { text: "Wed: Query optimization techniques module", link: "https://www.linkedin.com/learning/advanced-python-working-with-databases-22307421", completed: false },
-            { text: "Wed: Repo: Optimize slow queries device model", completed: false },
-            { text: "Thu: Repo: device_cache.py (Redis caching)", completed: false },
-            { text: "Fri: Repo: performance-dashboard Grafana JSON", completed: false }
+            { text: " DB performance optimization module", link: "https://www.linkedin.com/learning/advanced-python-working-with-databases-22307421", completed: false },
+            { text: " AI Prompt – Optimization for equipment monitoring", completed: false },
+            { text: " Repo: query_profiler.py", completed: false },
+            { text: " Query optimization techniques module", link: "https://www.linkedin.com/learning/advanced-python-working-with-databases-22307421", completed: false },
+            { text: " Repo: Optimize slow queries device model", completed: false },
+            { text: " Repo: device_cache.py (Redis caching)", completed: false },
+            { text: " Repo: performance-dashboard Grafana JSON", completed: false }
         ]},
         { id: 18, title: "Testing – Broadcast Quality Assurance", phase: "Building", successGoal: "Comprehensive automated testing", tasks: [
-            { text: "Mon: TDD fundamentals module", link: "https://www.linkedin.com/learning/programming-foundations-test-driven-development-3", completed: false },
-            { text: "Mon: AI – Testing like broadcast QA", completed: false },
-            { text: "Tue: Repo: test_device_status.py unit tests", completed: false },
-            { text: "Wed: Integration testing strategies module", link: "https://www.linkedin.com/learning/programming-foundations-test-driven-development-3", completed: false },
-            { text: "Wed: Repo: test_monitoring_workflow.py integration", completed: false },
-            { text: "Thu: Repo: test_equipment_failures.py E2E failure sims", completed: false },
-            { text: "Fri: Repo: CI/CD workflow testing.yml", completed: false }
+            { text: " TDD fundamentals module", link: "https://www.linkedin.com/learning/programming-foundations-test-driven-development-3", completed: false },
+            { text: " AI Prompt – Testing like broadcast QA", completed: false },
+            { text: " Repo: test_device_status.py unit tests", completed: false },
+            { text: " Integration testing strategies module", link: "https://www.linkedin.com/learning/programming-foundations-test-driven-development-3", completed: false },
+            { text: " Repo: test_monitoring_workflow.py integration", completed: false },
+            { text: " Repo: test_equipment_failures.py E2E failure sims", completed: false },
+            { text: " Repo: CI/CD workflow testing.yml", completed: false }
         ]},
         { id: 19, title: "System Architecture – Broadcast Infrastructure Design", phase: "Advanced", successGoal: "Professional architecture articulation", tasks: [
-            { text: "Mon: Architecture patterns module", link: "https://www.linkedin.com/learning/software-architecture-foundations", completed: false },
-            { text: "Mon: AI – Software architecture vs broadcast facility design", completed: false },
-            { text: "Tue: Repo: system-overview-[name].md", completed: false },
-            { text: "Wed: System design principles module", link: "https://www.linkedin.com/learning/software-architecture-foundations", completed: false },
-            { text: "Wed: Repo: microservices-plan.md improvements", completed: false },
-            { text: "Thu: Create diagrams (draw.io) in docs/architecture/diagrams", completed: false },
-            { text: "Fri: Propose improvements via GitHub issue (broadcast analogies)", completed: false }
+            { text: " Architecture patterns module", link: "https://www.linkedin.com/learning/software-architecture-foundations", completed: false },
+            { text: " AI Prompt – Software architecture vs broadcast facility design", completed: false },
+            { text: " Repo: system-overview-[name].md", completed: false },
+            { text: " System design principles module", link: "https://www.linkedin.com/learning/software-architecture-foundations", completed: false },
+            { text: " Repo: microservices-plan.md improvements", completed: false },
+            { text: " Create diagrams (draw.io) in docs/architecture/diagrams", completed: false },
+            { text: " Propose improvements via GitHub issue (broadcast analogies)", completed: false }
         ]},
         { id: 20, title: "Advanced Integration – Enterprise Equipment Systems", phase: "Advanced", successGoal: "Enterprise-grade external integrations", tasks: [
-            { text: "Mon: Watch 'API design principles' module", link: "https://www.linkedin.com/learning/designing-restful-apis", completed: false },
-            { text: "Mon: Repo: Document external API requirements (api-requirements.md)", completed: false },
-            { text: "Tue: Repo: Build Snipe-IT integration (services/integration-service/app/snipeit/)", completed: false },
-            { text: "Wed: Watch 'API documentation & versioning' module", link: "https://www.linkedin.com/learning/designing-restful-apis", completed: false },
-            { text: "Wed: Repo: Create OpenAPI spec external-integrations.yaml", completed: false },
-            { text: "Thu: Repo: Implement complex error handling (error_handling/)", completed: false },
-            { text: "Fri: Repo: Deploy integration to staging & document deployment", completed: false }
+            { text: " Watch 'API design principles' module", link: "https://www.linkedin.com/learning/designing-restful-apis", completed: false },
+            { text: " Repo: Document external API requirements (api-requirements.md)", completed: false },
+            { text: " Repo: Build Snipe-IT integration (services/integration-service/app/snipeit/)", completed: false },
+            { text: " Watch 'API documentation & versioning' module", link: "https://www.linkedin.com/learning/designing-restful-apis", completed: false },
+            { text: " Repo: Create OpenAPI spec external-integrations.yaml", completed: false },
+            { text: " Repo: Implement complex error handling (error_handling/)", completed: false },
+            { text: " Repo: Deploy integration to staging & document deployment", completed: false }
         ]},
         { id: 21, title: "Deployment & DevOps – Production Broadcast Systems", phase: "Advanced", successGoal: "Reliable production deployment workflow", tasks: [
-            { text: "Mon: Watch 'Containerization basics' (Learning Docker) + AI DevOps practices", link: "https://www.linkedin.com/learning/learning-docker-2", completed: false },
-            { text: "Tue: Configure production environment settings", completed: false },
-            { text: "Wed: Watch 'CI/CD pipelines' (DevOps Foundations) + Implement deployment pipeline", link: "https://www.linkedin.com/learning/devops-foundations", completed: false },
-            { text: "Thu: Configure production monitoring & alerting", completed: false },
-            { text: "Fri: Full production deployment + AI operations review", completed: false }
+            { text: " Watch 'Containerization basics' (Learning Docker) + AI DevOps practices", link: "https://www.linkedin.com/learning/learning-docker-2", completed: false },
+            { text: " Configure production environment settings", completed: false },
+            { text: " Watch 'CI/CD pipelines' (DevOps Foundations) + Implement deployment pipeline", link: "https://www.linkedin.com/learning/devops-foundations", completed: false },
+            { text: " Configure production monitoring & alerting", completed: false },
+            { text: " Full production deployment + AI operations review", completed: false }
         ]},
         { id: 22, title: "Break Week – Mastery Assessment", phase: "Advanced", successGoal: "Ready for technical leadership", tasks: [
             { text: "Comprehensive code review with AI (senior dev role)", completed: false },
@@ -375,32 +740,32 @@ const createInitialUserData = (displayName) => {
             { text: "Rest & prepare for leadership phase", completed: false }
         ]},
         { id: 23, title: "Team Leadership – Mentoring Engineers", phase: "Advanced", successGoal: "Effective mentoring capability", tasks: [
-            { text: "Mon: Watch 'Coaching & mentoring' + AI guidance teaching engineers", link: "https://www.linkedin.com/learning/coach-your-team-to-learn-stretch-and-grow", completed: false },
-            { text: "Tue: Conduct code review session for teammate", completed: false },
-            { text: "Wed: Watch 'Building technical skills in teams' + Lead system improvement discussion", link: "https://www.linkedin.com/learning/coach-your-team-to-learn-stretch-and-grow", completed: false },
-            { text: "Thu: Mentor colleague through programming challenge", completed: false },
-            { text: "Fri: Leadership skills reflection with AI", completed: false }
+            { text: " Watch 'Coaching & mentoring' + AI guidance teaching engineers", link: "https://www.linkedin.com/learning/coach-your-team-to-learn-stretch-and-grow", completed: false },
+            { text: " Conduct code review session for teammate", completed: false },
+            { text: " Watch 'Building technical skills in teams' + Lead system improvement discussion", link: "https://www.linkedin.com/learning/coach-your-team-to-learn-stretch-and-grow", completed: false },
+            { text: " Mentor colleague through programming challenge", completed: false },
+            { text: " Leadership skills reflection with AI", completed: false }
         ]},
         { id: 24, title: "Innovation Projects – Custom Broadcast Solutions", phase: "Advanced", successGoal: "Novel broadcast-focused solution", tasks: [
-            { text: "Mon: Watch 'Problem identification & analysis' + Identify unique challenges", link: "https://www.linkedin.com/learning/strategic-thinking", completed: false },
-            { text: "Tue: Design custom solution architecture w/ AI", completed: false },
-            { text: "Wed: Watch 'Solution design & planning' + Prototype proof-of-concept", link: "https://www.linkedin.com/learning/strategic-thinking", completed: false },
-            { text: "Thu: Implement core functionality", completed: false },
-            { text: "Fri: Demo solution (AI presentation coaching)", completed: false }
+            { text: " Watch 'Problem identification & analysis' + Identify unique challenges", link: "https://www.linkedin.com/learning/strategic-thinking", completed: false },
+            { text: " Design custom solution architecture w/ AI", completed: false },
+            { text: " Watch 'Solution design & planning' + Prototype proof-of-concept", link: "https://www.linkedin.com/learning/strategic-thinking", completed: false },
+            { text: " Implement core functionality", completed: false },
+            { text: " Demo solution (AI presentation coaching)", completed: false }
         ]},
         { id: 25, title: "Professional Practice – Industry Standards", phase: "Advanced", successGoal: "Professional-grade engineering habits", tasks: [
-            { text: "Mon: Watch 'Professional development practices' + AI consultation", link: "https://www.linkedin.com/learning/programming-foundations-real-world-examples", completed: false },
-            { text: "Tue: Implement documentation & commenting standards", completed: false },
-            { text: "Wed: Watch 'Industry best practices' + Setup pro dev tools", link: "https://www.linkedin.com/learning/programming-foundations-real-world-examples", completed: false },
-            { text: "Thu: Peer code review & collaboration workflow practice", completed: false },
-            { text: "Fri: Professional skills evaluation with AI", completed: false }
+            { text: " Watch 'Professional development practices' + AI consultation", link: "https://www.linkedin.com/learning/programming-foundations-real-world-examples", completed: false },
+            { text: " Implement documentation & commenting standards", completed: false },
+            { text: " Watch 'Industry best practices' + Setup pro dev tools", link: "https://www.linkedin.com/learning/programming-foundations-real-world-examples", completed: false },
+            { text: " Peer code review & collaboration workflow practice", completed: false },
+            { text: " Professional skills evaluation with AI", completed: false }
         ]},
         { id: 26, title: "Graduation – Portfolio & Next Steps", phase: "Advanced", successGoal: "Ready to lead and teach others", tasks: [
-            { text: "Mon: Watch 'Building your professional brand' + Build portfolio", link: "https://www.linkedin.com/learning/learning-personal-branding-2018", completed: false },
-            { text: "Tue: Document case studies of solved broadcast problems", completed: false },
-            { text: "Wed: Watch 'Career positioning strategies' + Plan next phase", link: "https://www.linkedin.com/learning/learning-personal-branding-2018", completed: false },
-            { text: "Thu: Network with broadcast engineers who program", completed: false },
-            { text: "Fri: Celebrate transformation & reflect achievements", completed: false }
+            { text: " Watch 'Building your professional brand' + Build portfolio", link: "https://www.linkedin.com/learning/learning-personal-branding-2018", completed: false },
+            { text: " Document case studies of solved broadcast problems", completed: false },
+            { text: " Watch 'Career positioning strategies' + Plan next phase", link: "https://www.linkedin.com/learning/learning-personal-branding-2018", completed: false },
+            { text: " Network with broadcast engineers who program", completed: false },
+            { text: " Celebrate transformation & reflect achievements", completed: false }
         ]},
     ];
     
@@ -798,6 +1163,359 @@ const ReflectionSheet = ({ userData, onUpdate, isReadOnly = false }) => {
     );
 };
 
+const AIPromptsSheet = ({ userData, isReadOnly = false }) => {
+    const [activeCategory, setActiveCategory] = useState('Foundation');
+    const [activeTemplate, setActiveTemplate] = useState(null);
+    const [activeExample, setActiveExample] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [copiedTemplate, setCopiedTemplate] = useState(null);
+    
+    const categories = ['Foundation', 'Learning', 'Problem Solving', 'Planning', 'Career'];
+    
+    const copyToClipboard = (text, templateId) => {
+        navigator.clipboard.writeText(text).then(() => {
+            setCopiedTemplate(templateId);
+            setTimeout(() => setCopiedTemplate(null), 2000);
+        });
+    };
+
+    const filteredTemplates = Object.entries(AI_PROMPT_TEMPLATES).filter(([id, template]) => {
+        const matchesCategory = activeCategory === 'All' || template.category === activeCategory;
+        const matchesSearch = searchTerm === '' || 
+            template.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            template.description.toLowerCase().includes(searchTerm.toLowerCase());
+        return matchesCategory && matchesSearch;
+    });
+
+    const getCurrentWeekExamples = () => {
+        if (!userData?.weeks) return [];
+        
+        // Find the current week (first incomplete week)
+        let currentWeek = userData.weeks.find(w => w.progress < 100);
+        
+        // If no incomplete weeks, check the most recently worked on week
+        if (!currentWeek) {
+            currentWeek = userData.weeks.reduce((latest, week) => {
+                return week.progress > (latest?.progress || 0) ? week : latest;
+            }, null);
+        }
+        
+        if (!currentWeek) return [];
+        
+        // Get examples for current week
+        const examples = Object.entries(AI_PROMPT_EXAMPLES).filter(([id, example]) => 
+            example.week === currentWeek.id
+        );
+        
+        return examples;
+    };
+
+    // For demonstration, let's also add a function to get examples for any week
+    const getExamplesForWeek = (weekNumber) => {
+        return Object.entries(AI_PROMPT_EXAMPLES).filter(([id, example]) => 
+            example.week === weekNumber
+        );
+    };
+
+    return (
+        <div className="space-y-6">
+
+                        {/* Quick Tips */}
+            <Card>
+                <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <BrainCircuit className="w-5 h-5 text-purple-600" />
+                    Quick Tips for Better AI Conversations
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <h5 className="font-semibold text-yellow-800 mb-2">🎯 Be Specific</h5>
+                        <p className="text-sm text-yellow-700">
+                            Replace ALL [bracketed placeholders] with your exact situation. 
+                            The more specific you are, the better help you'll get.
+                        </p>
+                    </div>
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <h5 className="font-semibold text-green-800 mb-2">🔄 Follow Up</h5>
+                        <p className="text-sm text-green-700">
+                            Ask clarifying questions, request examples, or ask the AI to 
+                            explain something differently if you don't understand.
+                        </p>
+                    </div>
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h5 className="font-semibold text-blue-800 mb-2">📺 Use Your Experience</h5>
+                        <p className="text-sm text-blue-700">
+                            Always mention your broadcast engineering background - it's your 
+                            superpower for learning programming concepts.
+                        </p>
+                    </div>
+                    <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                        <h5 className="font-semibold text-purple-800 mb-2">🔍 Test Understanding</h5>
+                        <p className="text-sm text-purple-700">
+                            Ask the AI to quiz you or have you explain concepts back to 
+                            ensure you really understand before moving on.
+                        </p>
+                    </div>
+                </div>
+            </Card>
+            
+            {/* Header */}
+            <Card>
+                <div className="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                            <Bot className="w-6 h-6 text-blue-600" />
+                            AI Prompts Helper
+                        </h3>
+                        <p className="text-gray-600 mt-1">
+                            Copy-paste prompts designed for broadcast engineers learning programming
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Search prompts..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                            />
+                        </div>
+                    </div>
+                </div>
+                
+                {/* Category Tabs */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                    {categories.map(category => (
+                        <button
+                            key={category}
+                            onClick={() => setActiveCategory(category)}
+                            className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+                                activeCategory === category
+                                    ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            }`}
+                        >
+                            {category}
+                        </button>
+                    ))}
+                </div>
+            </Card>
+
+            {/* Prompt Templates */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Templates List */}
+                <Card>
+                    <h4 className="text-lg font-bold text-gray-800 mb-4">
+                        {activeCategory} Prompts ({filteredTemplates.length})
+                    </h4>
+                    <div className="space-y-3 max-h-96 overflow-y-auto">
+                        {filteredTemplates.map(([id, template]) => (
+                            <div
+                                key={id}
+                                onClick={() => {
+                                    setActiveTemplate(id);
+                                    setActiveExample(null); // Clear example selection
+                                }}
+                                className={`p-4 rounded-lg border cursor-pointer transition-all ${
+                                    activeTemplate === id
+                                        ? 'border-blue-300 bg-blue-50'
+                                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                                }`}
+                            >
+                                <div className="flex items-start justify-between">
+                                    <div className="flex-1">
+                                        <h5 className="font-semibold text-gray-800">{template.title}</h5>
+                                        <p className="text-sm text-gray-600 mt-1">{template.description}</p>
+                                        <span className="inline-block bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full mt-2">
+                                            {template.category}
+                                        </span>
+                                    </div>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            copyToClipboard(template.template, id);
+                                        }}
+                                        className="ml-2 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md"
+                                    >
+                                        <Copy className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </Card>
+
+                {/* Template Preview */}
+                <Card>
+                    <div className="flex items-center justify-between mb-4">
+                        <h4 className="text-lg font-bold text-gray-800">
+                            {activeTemplate ? AI_PROMPT_TEMPLATES[activeTemplate]?.title : 
+                             activeExample ? AI_PROMPT_EXAMPLES[activeExample]?.title :
+                             'Select a Template or Example'}
+                        </h4>
+                        {(activeTemplate || activeExample) && (
+                            <button
+                                onClick={() => {
+                                    const content = activeTemplate ? 
+                                        AI_PROMPT_TEMPLATES[activeTemplate].template :
+                                        AI_PROMPT_EXAMPLES[activeExample].example;
+                                    const id = activeTemplate || activeExample;
+                                    copyToClipboard(content, id);
+                                }}
+                                className="flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-lg hover:bg-blue-200 font-medium"
+                            >
+                                <Copy className="w-4 h-4" />
+                                {copiedTemplate === (activeTemplate || activeExample) ? 'Copied!' : 
+                                 activeTemplate ? 'Copy Template' : 'Copy Example'}
+                            </button>
+                        )}
+                    </div>
+                    
+                    {(activeTemplate || activeExample) ? (
+                        <div className="space-y-4">
+                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                                <p className="text-sm text-gray-600 mb-3">
+                                    {activeTemplate ? 
+                                        AI_PROMPT_TEMPLATES[activeTemplate].description :
+                                        AI_PROMPT_EXAMPLES[activeExample].situation
+                                    }
+                                </p>
+                                <div className="bg-white border border-gray-200 rounded-md p-4 max-h-80 overflow-y-auto">
+                                    <pre className="text-sm text-gray-700 whitespace-pre-wrap font-mono">
+                                        {activeTemplate ? 
+                                            AI_PROMPT_TEMPLATES[activeTemplate].template :
+                                            AI_PROMPT_EXAMPLES[activeExample].example
+                                        }
+                                    </pre>
+                                </div>
+                            </div>
+                            
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <h5 className="font-semibold text-blue-800 mb-2">💡 How to Use This {activeTemplate ? 'Template' : 'Example'}</h5>
+                                <ul className="text-sm text-blue-700 space-y-1">
+                                    {activeTemplate ? (
+                                        <>
+                                            <li>• Copy the template above</li>
+                                            <li>• Replace [bracketed placeholders] with your specific information</li>
+                                            <li>• Paste into ChatGPT, Claude, or your preferred AI assistant</li>
+                                            <li>• Have a productive learning conversation!</li>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <li>• This is a real example for {AI_PROMPT_EXAMPLES[activeExample]?.situation}</li>
+                                            <li>• Copy and adapt it for your specific situation</li>
+                                            <li>• Replace details to match your broadcast experience</li>
+                                            <li>• Use it as a starting point for your own prompts</li>
+                                        </>
+                                    )}
+                                </ul>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="text-center py-12 text-gray-500">
+                            <Bot className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                            <p>Select a prompt template or example from the list to preview it here.</p>
+                        </div>
+                    )}
+                </Card>
+            </div>
+
+            {/* Current Week Examples */}
+            {getCurrentWeekExamples().length > 0 && (
+                <Card>
+                    <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <Target className="w-5 h-5 text-green-600" />
+                        Examples for Your Current Week
+                    </h4>
+                    <div className="grid gap-4">
+                        {getCurrentWeekExamples().map(([id, example]) => (
+                            <div key={id} className="bg-green-50 border border-green-200 rounded-lg p-4">
+                                <div className="flex items-start justify-between mb-2">
+                                    <div>
+                                        <h5 className="font-semibold text-green-800">{example.title}</h5>
+                                        <p className="text-sm text-green-600">{example.situation}</p>
+                                    </div>
+                                    <button
+                                        onClick={() => copyToClipboard(example.example, id)}
+                                        className="flex items-center gap-1 bg-green-100 text-green-700 px-3 py-1 rounded-md hover:bg-green-200 text-sm font-medium"
+                                    >
+                                        <Copy className="w-4 h-4" />
+                                        {copiedTemplate === id ? 'Copied!' : 'Copy'}
+                                    </button>
+                                </div>
+                                <div className="bg-white border border-green-200 rounded-md p-3 mt-3">
+                                    <pre className="text-xs text-gray-700 whitespace-pre-wrap font-mono">
+                                        {example.example.length > 200 ? 
+                                            `${example.example.substring(0, 200)}...` : 
+                                            example.example
+                                        }
+                                    </pre>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </Card>
+            )}
+
+            {/* Featured Examples - Always Show */}
+            <Card>
+                <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <Star className="w-5 h-5 text-yellow-600" />
+                    Featured Examples by Learning Phase
+                </h4>
+                <p className="text-gray-600 mb-4">
+                    Real examples of how to use prompts for different learning situations
+                </p>
+                <div className="grid gap-4">
+                    {Object.entries(AI_PROMPT_EXAMPLES).map(([id, example]) => (
+                        <div key={id} className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <div className="flex items-start justify-between mb-2">
+                                <div>
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium">
+                                            Week {example.week}
+                                        </span>
+                                        <h5 className="font-semibold text-blue-800">{example.title}</h5>
+                                    </div>
+                                    <p className="text-sm text-blue-600">{example.situation}</p>
+                                </div>
+                                <button
+                                    onClick={() => copyToClipboard(example.example, id)}
+                                    className="flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-1 rounded-md hover:bg-blue-200 text-sm font-medium"
+                                >
+                                    <Copy className="w-4 h-4" />
+                                    {copiedTemplate === id ? 'Copied!' : 'Copy'}
+                                </button>
+                            </div>
+                            <div className="bg-white border border-blue-200 rounded-md p-3 mt-3">
+                                <pre className="text-xs text-gray-700 whitespace-pre-wrap font-mono">
+                                    {example.example.length > 300 ? 
+                                        `${example.example.substring(0, 300)}...` : 
+                                        example.example
+                                    }
+                                </pre>
+                                {example.example.length > 300 && (
+                                    <button
+                                        onClick={() => {
+                                            setActiveExample(id);
+                                            setActiveTemplate(null); // Clear template selection
+                                        }}
+                                        className="mt-2 text-blue-600 hover:text-blue-800 text-xs underline"
+                                    >
+                                        View full example →
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </Card>
+
+        </div>
+    );
+};
+
 // --- AUTHENTICATION COMPONENT ---
 const AuthComponent = ({ auth, db }) => {
     const [isLogin, setIsLogin] = useState(true);
@@ -1153,6 +1871,7 @@ const WorkbookContainer = ({ user, userData, onUpdate, onToggleTask, onSignOut, 
         'Project Gallery': { icon: <ImagePlus className="w-4 h-4" />, component: <ProjectGallerySheet userData={userData} onUpdate={onUpdate} isReadOnly={isReadOnly} /> },
         'Course Tracker': { icon: <BookCopy className="w-4 h-4" />, component: <CourseTrackerSheet userData={userData} onUpdate={onUpdate} isReadOnly={isReadOnly} /> },
         'Achievements': { icon: <Trophy className="w-4 h-4" />, component: <AchievementsSheet userData={userData} /> },
+        'AI Prompts': { icon: <Bot className="w-4 h-4" />, component: <AIPromptsSheet userData={userData} isReadOnly={isReadOnly} /> },
         'Reflection': { icon: <MessageSquare className="w-4 h-4" />, component: <ReflectionSheet userData={userData} onUpdate={onUpdate} isReadOnly={isReadOnly || user.email === TEACHER_EMAIL} /> },
     };
 
