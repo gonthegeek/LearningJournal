@@ -864,7 +864,7 @@ const AuthComponent = ({ auth, db }) => {
 };
 
 // --- TEACHER COMPONENTS ---
-const TeacherDashboard = ({ allStudentsData, onSelectStudent, onSignOut, onRefresh }) => {
+const TeacherDashboard = ({ allStudentsData, onSelectStudent, onSignOut, onRefresh, firebaseServices }) => {
     const [sortBy, setSortBy] = useState('name'); // 'name', 'progress', 'lastActivity'
     const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -872,6 +872,14 @@ const TeacherDashboard = ({ allStudentsData, onSelectStudent, onSignOut, onRefre
         setIsRefreshing(true);
         await onRefresh();
         setIsRefreshing(false);
+    };
+
+    const handleRunMigration = () => {
+        if (!firebaseServices || !firebaseServices.db) {
+            alert("Error: Firebase services not available.");
+            return;
+        }
+        window.runMigration(firebaseServices.db);
     };
     
     const sortedStudents = useMemo(() => {
@@ -983,7 +991,7 @@ const TeacherDashboard = ({ allStudentsData, onSelectStudent, onSignOut, onRefre
                             {isRefreshing ? 'Refreshing...' : 'Refresh Data'}
                         </button>
                         <button 
-                            onClick={() => window.runMigration()} 
+                            onClick={handleRunMigration} 
                             className="flex items-center gap-2 bg-yellow-100 text-yellow-700 p-2 rounded-lg font-semibold text-sm hover:bg-yellow-200"
                         >
                             <span>⚙️</span>
@@ -1406,9 +1414,15 @@ function App() {
                 onSignOut={handleSignOut}
             />
         }
-        return <TeacherDashboard allStudentsData={allStudentsData} onSelectStudent={(student) => {
-            setSelectedStudent(student);
-        }} onRefresh={handleRefreshStudentData} onSignOut={handleSignOut} />
+        return <TeacherDashboard 
+            allStudentsData={allStudentsData} 
+            onSelectStudent={(student) => {
+                setSelectedStudent(student);
+            }} 
+            onRefresh={handleRefreshStudentData} 
+            onSignOut={handleSignOut} 
+            firebaseServices={firebaseServices}
+        />
     }
 
     // Default is student view

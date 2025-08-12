@@ -294,8 +294,15 @@ function migrateWeeks() {
 
 /**
  * Main migration function to be called from the browser console.
+ * @param {object} db - The initialized and configured Firestore database instance.
  */
-async function runMigration() {
+window.runMigration = async function(db) {
+    if (!db) {
+        console.error("Firestore database instance is required.");
+        alert("Error: Firestore database instance is not available.");
+        return;
+    }
+
     if (!window.firebase || !window.firebase.auth().currentUser) {
         console.error("You must be logged in to run the migration.");
         alert("Error: You must be logged in to run the migration.");
@@ -315,7 +322,6 @@ async function runMigration() {
 
     console.log("Starting migration...");
 
-    const db = window.firebase.firestore();
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
     const usersCollectionRef = db.collection('artifacts').doc(appId).collection('users');
 
