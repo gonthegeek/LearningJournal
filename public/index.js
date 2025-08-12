@@ -140,44 +140,268 @@ const ACHIEVEMENTS_LIST = [
 ];
 
 const COURSES_LIST = [
+    { name: "Career Essentials in Software Development by Microsoft and LinkedIn", link: "https://www.linkedin.com/learning/paths/career-essentials-in-software-development-by-microsoft-and-linkedin" },
     { name: "Learning Git and GitHub", link: "https://www.linkedin.com/learning/learning-git-and-github-14213624" },
     { name: "SQL for Non-Programmers", link: "https://www.linkedin.com/learning/sql-for-non-programmers" },
     { name: "HTML, CSS, and JavaScript: Building the Web", link: "https://www.linkedin.com/learning/html-css-and-javascript-building-the-web" },
     { name: "JavaScript Essential Training", link: "https://www.linkedin.com/learning/javascript-essential-training" },
     { name: "Python for Non-Programmers", link: "https://www.linkedin.com/learning/python-for-non-programmers" },
     { name: "Introduction to Web APIs", link: "https://www.linkedin.com/learning/introduction-to-web-apis" },
-    { name: "Data Visualization: Best Practices", link: "https://www.linkedin.com/learning/data-visualization-best-practices" },
+    { name: "Learning REST APIs", link: "https://www.linkedin.com/learning/learning-rest-apis" },
+    { name: "Data Visualization: Best Practices", link: "https://www.linkedin.com/learning/data-visualization-best-practices-14429760" },
+    { name: "React.js Essential Training", link: "https://www.linkedin.com/learning/react-js-essential-training-14836121" },
     { name: "Programming Foundations: Software Testing/QA", link: "https://www.linkedin.com/learning/programming-foundations-software-testing-qa" },
-    { name: "Programming Foundations: Web Security", link: "https://www.linkedin.com/learning/programming-foundations-web-security-2" },
-    { name: "Learning Docker", link: "https://www.linkedin.com/learning/learning-docker-17236240" },
+    { name: "React Authentication", link: "https://www.linkedin.com/learning/react-authentication-25660373" },
+    { name: "Advanced Python: Working with Databases", link: "https://www.linkedin.com/learning/advanced-python-working-with-databases-22307421" },
+    { name: "Programming Foundations: Test-Driven Development", link: "https://www.linkedin.com/learning/programming-foundations-test-driven-development-3" },
+    { name: "Software Architecture Foundations", link: "https://www.linkedin.com/learning/software-architecture-foundations" },
+    { name: "Designing RESTful APIs", link: "https://www.linkedin.com/learning/designing-restful-apis" },
+    { name: "Learning Docker", link: "https://www.linkedin.com/learning/learning-docker-2" },
+    { name: "DevOps Foundations", link: "https://www.linkedin.com/learning/devops-foundations" },
+    { name: "Coach Your Team to Learn, Stretch, and Grow", link: "https://www.linkedin.com/learning/coach-your-team-to-learn-stretch-and-grow" },
+    { name: "Strategic Thinking", link: "https://www.linkedin.com/learning/strategic-thinking" },
+    { name: "Programming Foundations: Real-World Examples", link: "https://www.linkedin.com/learning/programming-foundations-real-world-examples" },
+    { name: "Learning Personal Branding (2018)", link: "https://www.linkedin.com/learning/learning-personal-branding-2018" },
 ];
 
 const createInitialUserData = (displayName) => {
     const initialLearningPlanData = [
-        { id: 1, title: "What is Programming, Really?", phase: "Foundation", tasks: [ { text: "Watch 'Learning Git and GitHub'", link: "https://www.linkedin.com/learning/learning-git-and-github-14213624", completed: false }, { text: "Project: Get MinionMonitor running & add one device", completed: false } ] },
-        { id: 2, title: "Understanding Data and Equipment", phase: "Foundation", tasks: [ { text: "Watch 'SQL for Non-Programmers'", link: "https://www.linkedin.com/learning/sql-for-non-programmers", completed: false }, { text: "Project: Add equipment data & understand organization", completed: false } ] },
-        { id: 3, title: "Making Web Pages Interactive", phase: "Foundation", tasks: [ { text: "Watch 'HTML, CSS, and JavaScript: Building the Web'", link: "https://www.linkedin.com/learning/html-css-and-javascript-building-the-web", completed: false }, { text: "Project: Customize the interface", completed: false } ] },
-        { id: 4, title: "Simple Logic and Automation", phase: "Foundation", tasks: [ { text: "Watch 'JavaScript Essential Training'", link: "https://www.linkedin.com/learning/javascript-essential-training", completed: false }, { text: "Project: Understand basic logic & make an element interactive", completed: false } ] },
-        { id: 5, title: "Break/Catch-Up Week", phase: "Foundation", tasks: [ { text: "Catch up on any courses you're behind on", completed: false }, { text: "Review what you've learned so far", completed: false }, { text: "Take a break if you need one!", completed: false } ] },
-        { id: 6, title: "Python Basics for Monitoring", phase: "Foundation", tasks: [ { text: "Watch 'Python for Non-Programmers'", link: "https://www.linkedin.com/learning/python-for-non-programmers", completed: false }, { text: "Project: Understand the backend & make a simple change", completed: false } ] },
-        { id: 7, title: "APIs & Backend Development", phase: "Foundation", tasks: [ { text: "Watch 'Introduction to Web APIs'", link: "https://www.linkedin.com/learning/introduction-to-web-apis", completed: false }, { text: "Project: Understand how system parts communicate via APIs", completed: false } ] },
-        { id: 8, title: "Equipment Monitoring Concepts", phase: "Foundation", tasks: [ { text: "Review previous courses or take a break", completed: false }, { text: "Project: Understand basic monitoring concepts like ping checks", completed: false } ] },
-        { id: 9, title: "Data Visualization", phase: "Building", tasks: [ { text: "Watch 'Data Visualization: Best Practices'", link: "https://www.linkedin.com/learning/data-visualization-best-practices", completed: false }, { text: "Project: Understand how charts work in the system", completed: false } ] },
-        { id: 10, title: "Extended Break/Catch-Up", phase: "Building", tasks: [ { text: "Catch up on any courses you're behind on", completed: false }, { text: "Review and improve anything you've built so far", completed: false } ] },
-        { id: 11, title: "Alert Concepts & Notifications", phase: "Building", tasks: [ { text: "Review alert code and concepts", completed: false }, { text: "Project: Understand how alerts are triggered", completed: false } ] },
-        { id: 12, title: "System Integration Basics", phase: "Building", tasks: [ { text: "Look at data import functionality", completed: false }, { text: "Project: Understand data validation and import a small file", completed: false } ] },
-        { id: 13, title: "Testing and Quality", phase: "Building", tasks: [ { text: "Watch 'Programming Foundations: Software Testing/QA'", link: "https://www.linkedin.com/learning/programming-foundations-software-testing-qa", completed: false }, { text: "Project: Understand testing basics and why they matter", completed: false } ] },
-        { id: 14, title: "Personal Project Week", phase: "Building", tasks: [ { text: "Review everything you've learned so far", completed: false }, { text: "Project: Build something small for your facility's needs", completed: false } ] },
-        { id: 15, title: "Security Basics", phase: "Building", tasks: [ { text: "Watch 'Programming Foundations: Web Security'", link: "https://www.linkedin.com/learning/programming-foundations-web-security-2", completed: false }, { text: "Project: Review how authentication works", completed: false } ] },
-        { id: 16, title: "Performance & Optimization", phase: "Building", tasks: [ { text: "Check how fast pages load in the application", completed: false }, { text: "Project: Identify one performance bottleneck", completed: false } ] },
-        { id: 17, title: "Break Week", phase: "Advanced", tasks: [ { text: "No new learning required", completed: false }, { text: "Use spare time to practice existing skills", completed: false } ] },
-        { id: 18, title: "Deployment & DevOps Basics", phase: "Advanced", tasks: [ { text: "Watch 'Learning Docker'", link: "https://www.linkedin.com/learning/learning-docker-17236240", completed: false }, { text: "Project: Understand how the project is deployed", completed: false } ] },
-        { id: 19, title: "Advanced Database Concepts", phase: "Advanced", tasks: [ { text: "Review advanced database materials", completed: false }, { text: "Project: Write a complex database query", completed: false } ] },
-        { id: 20, title: "Integration and Planning", phase: "Advanced", tasks: [ { text: "Review all the concepts you've learned", completed: false }, { text: "Project: Plan your next learning goals", completed: false } ] },
-        { id: 21, title: "Specialization: Path 1", phase: "Advanced", tasks: [ { text: "Choose your focus: Frontend, Backend, or Integration", completed: false }, { text: "Start an advanced course in your chosen area", completed: false } ] },
-        { id: 22, "title": "Specialization: Path 2", phase: "Advanced", tasks: [ { text: "Continue your chosen specialization path", completed: false }, { text: "Work on a project related to your specialization", completed: false } ] },
-        { id: 23, title: "Leadership Track: Mentoring", phase: "Advanced", tasks: [ { text: "Mentor new learners on the team", completed: false }, { text: "Help a colleague understand a concept", completed: false } ] },
-        { id: 24, title: "Leadership Track: Initiatives", phase: "Advanced", tasks: [ { text: "Lead a small development initiative", completed: false }, { text: "Plan and present a new feature idea", completed: false } ] },
+        { id: 0, title: "Career Essentials – Professional Programming Foundations", phase: "Foundation", successGoal: "Understand professional programming landscape for broadcast", tasks: [
+            { text: "Mon: Course 1 – Introduction module (Career overview ~25m)", link: "https://www.linkedin.com/learning/paths/career-essentials-in-software-development-by-microsoft-and-linkedin", completed: false },
+            { text: "Mon: AI Prompt – How do these career skills apply to broadcast engineers?", completed: false },
+            { text: "Tue: Course 1 – Skills and tools module (~25m)", link: "https://www.linkedin.com/learning/paths/career-essentials-in-software-development-by-microsoft-and-linkedin", completed: false },
+            { text: "Tue: AI Prompt – Relate programming career skills to broadcast engineering", completed: false },
+            { text: "Wed: Course 1 – Industry perspectives module (~25m)", link: "https://www.linkedin.com/learning/paths/career-essentials-in-software-development-by-microsoft-and-linkedin", completed: false },
+            { text: "Wed: AI Prompt – Apply programming skills in broadcast environments", completed: false },
+            { text: "Thu: Course 1 – Remaining sections (~25m)", link: "https://www.linkedin.com/learning/paths/career-essentials-in-software-development-by-microsoft-and-linkedin", completed: false },
+            { text: "Thu: AI Discussion – Professional development plan (broadcast focus)", completed: false },
+            { text: "Fri: Finish Course 1 & create learning plan for remaining courses", completed: false }
+        ]},
+        { id: 1, title: "Programming Foundations – Core Concepts", phase: "Foundation", successGoal: "Master core concepts w/ broadcast context", tasks: [
+            { text: "Mon: Course 2 – Fundamentals intro + basics (~25m)", link: "https://www.linkedin.com/learning/programming-foundations-fundamentals", completed: false },
+            { text: "Mon: AI – Connect programming fundamentals to broadcast system logic", completed: false },
+            { text: "Tue: Course 2 – Variables & data types (~25m)", link: "https://www.linkedin.com/learning/programming-foundations-fundamentals", completed: false },
+            { text: "Tue: AI – Relate variables to equipment parameters", completed: false },
+            { text: "Wed: Course 2 – Functions & methods (~25m)", link: "https://www.linkedin.com/learning/programming-foundations-fundamentals", completed: false },
+            { text: "Wed: AI – Functions like equipment control procedures", completed: false },
+            { text: "Thu: Course 2 – Conditionals & modular programming (~25m)", link: "https://www.linkedin.com/learning/programming-foundations-fundamentals", completed: false },
+            { text: "Thu: AI – Apply conditional logic to automation scenarios", completed: false },
+            { text: "Fri: Course 2 – Debugging & error handling (~25m)", link: "https://www.linkedin.com/learning/programming-foundations-fundamentals", completed: false },
+            { text: "Fri: AI – Compare debugging to equipment troubleshooting", completed: false }
+        ]},
+        { id: 2, title: "Advanced Foundations – Professional Practices", phase: "Foundation", successGoal: "Certificate complete + applied insights", tasks: [
+            { text: "Mon: Course 3 – Collections (~25m)", link: "https://www.linkedin.com/learning/programming-foundations-beyond-the-fundamentals", completed: false },
+            { text: "Mon: AI – Collections vs equipment inventories", completed: false },
+            { text: "Tue: Course 3 – External code & libraries (~25m)", link: "https://www.linkedin.com/learning/programming-foundations-beyond-the-fundamentals", completed: false },
+            { text: "Tue: AI – Libraries vs integrating 3rd-party equipment", completed: false },
+            { text: "Wed: Course 3 – Advanced debugging & error handling (~25m)", link: "https://www.linkedin.com/learning/programming-foundations-beyond-the-fundamentals", completed: false },
+            { text: "Wed: AI – Advanced troubleshooting techniques", completed: false },
+            { text: "Thu: Course 3 – Planning & documenting code (~25m)", link: "https://www.linkedin.com/learning/programming-foundations-beyond-the-fundamentals", completed: false },
+            { text: "Thu: AI – Documentation practices vs broadcast engineering", completed: false },
+            { text: "Fri: Complete certificate & create insights doc (repo)", completed: false },
+            { text: "Fri: AI – Review understanding of professional foundations", completed: false }
+        ]},
+        { id: 3, title: "Version Control – Project Tracking like Equipment Logs", phase: "Foundation", successGoal: "Track project like equipment docs", tasks: [
+            { text: "Mon: Watch Git course intro sections (~30m)", link: "https://www.linkedin.com/learning/learning-git-and-github-14213624", completed: false },
+            { text: "Mon: AI – Explain Git like broadcast change logs", completed: false },
+            { text: "Tue: Repo: Create learning branch feature/learning-[name] & add to LEARNERS.md", completed: false },
+            { text: "Wed: Watch 'Working with repositories' module", link: "https://www.linkedin.com/learning/learning-git-and-github-14213624", completed: false },
+            { text: "Wed: AI – Repos vs equipment documentation", completed: false },
+            { text: "Thu: Repo: Add new device type to shared/core/device_types.py", completed: false },
+            { text: "Fri: Repo: Create logs/learning/week1-[name].md (what you learned)", completed: false }
+        ]},
+        { id: 4, title: "Data & Databases – Why DBs Beat Excel", phase: "Foundation", successGoal: "Understand DB advantage for equipment mgmt", tasks: [
+            { text: "Mon: Watch 'Database fundamentals' module", link: "https://www.linkedin.com/learning/sql-for-non-programmers", completed: false },
+            { text: "Mon: AI – Databases vs equipment inventory systems", completed: false },
+            { text: "Tue: Repo: Explore models in device-service & document 3 fields", completed: false },
+            { text: "Tue: FreeCodeCamp: Start Bash boilerplate (optional)", link: "https://www.freecodecamp.org/learn/relational-database/", completed: false },
+            { text: "Wed: Watch 'Basic SQL queries' module", link: "https://www.linkedin.com/learning/sql-for-non-programmers", completed: false },
+            { text: "Wed: AI – Translate SQL queries to equipment searches", completed: false },
+            { text: "Wed: FreeCodeCamp: Student Database project (optional)", link: "https://www.freecodecamp.org/learn/relational-database/", completed: false },
+            { text: "Thu: Repo: Add a new device via UI & inspect API call", completed: false },
+            { text: "Fri: Repo: Create database-notes-[name].md (DB vs Excel)", completed: false }
+        ]},
+        { id: 5, title: "Web Interfaces – Equipment Monitoring Pages", phase: "Foundation", successGoal: "Display equipment info in UI", tasks: [
+            { text: "Mon: HTML basics modules", link: "https://www.linkedin.com/learning/html-css-and-javascript-building-the-web", completed: false },
+            { text: "Mon: AI – HTML vs signal flow diagrams", completed: false },
+            { text: "Tue: Repo: Modify Dashboard welcome message", completed: false },
+            { text: "Tue: FreeCodeCamp HTML Cat Photo App (optional)", link: "https://www.freecodecamp.org/learn/2022/responsive-web-design/", completed: false },
+            { text: "Wed: CSS styling modules", link: "https://www.linkedin.com/learning/html-css-and-javascript-building-the-web", completed: false },
+            { text: "Wed: AI – CSS like equipment front panels", completed: false },
+            { text: "Thu: Repo: Update header color (branding)", completed: false },
+            { text: "Thu: FreeCodeCamp Cafe Menu (optional)", link: "https://www.freecodecamp.org/learn/2022/responsive-web-design/", completed: false },
+            { text: "Fri: Repo: Create MyEquipmentList React component", completed: false }
+        ]},
+        { id: 6, title: "Programming Logic – If/Then Automation", phase: "Foundation", successGoal: "Apply conditionals to monitoring logic", tasks: [
+            { text: "Mon: JS Essential Training – Variables & data types", link: "https://www.linkedin.com/learning/javascript-essential-training", completed: false },
+            { text: "Mon: AI – Variables vs equipment settings", completed: false },
+            { text: "Tue: Repo: Add equipment variables file (config/equipment.js)", completed: false },
+            { text: "Wed: JS – Conditional statements module", link: "https://www.linkedin.com/learning/javascript-essential-training", completed: false },
+            { text: "Wed: AI – If/then vs automation logic", completed: false },
+            { text: "Thu: Repo: DeviceStatus.js color logic (R/Y/G)", completed: false },
+            { text: "Fri: Repo: Create alert rules file [name]_rules.py", completed: false }
+        ]},
+        { id: 7, title: "Break / Consolidate Foundation Skills", phase: "Foundation", successGoal: "Confidence with basics", tasks: [
+            { text: "Review confusing concepts with AI", completed: false },
+            { text: "Practice Git commands", completed: false },
+            { text: "Experiment with simple HTML/CSS changes", completed: false },
+            { text: "FreeCodeCamp deep dive (projects)", completed: false },
+            { text: "AI Portfolio review – progress & next steps", completed: false },
+            { text: "Rest & knowledge consolidation", completed: false }
+        ]},
+        { id: 8, title: "Backend Systems – Equipment Controllers", phase: "Foundation", successGoal: "Understand backend service role", tasks: [
+            { text: "Mon: Python intro modules", link: "https://www.linkedin.com/learning/python-for-non-programmers", completed: false },
+            { text: "Mon: AI – Python scripts vs control software", completed: false },
+            { text: "Tue: Repo: Explore device-service/main.py; add startup print", completed: false },
+            { text: "Wed: Python – Working with data module", link: "https://www.linkedin.com/learning/python-for-non-programmers", completed: false },
+            { text: "Wed: AI – Data handling like controllers", completed: false },
+            { text: "Thu: Repo: Create device check script", completed: false },
+            { text: "Fri: Repo: Add facility equipment to default_devices.py", completed: false }
+        ]},
+        { id: 9, title: "API Communication – Network Protocols", phase: "Foundation", successGoal: "Grasp request-response mechanics", tasks: [
+            { text: "Mon: API fundamentals module", link: "https://www.linkedin.com/learning/introduction-to-web-apis", completed: false },
+            { text: "Mon: AI – APIs vs SNMP/equipment protocols", completed: false },
+            { text: "Tue: Test GET /api/devices (curl/Postman) & document response", completed: false },
+            { text: "Wed: Making API requests module", link: "https://www.linkedin.com/learning/introduction-to-web-apis", completed: false },
+            { text: "Wed: AI – Requests like equipment commands", completed: false },
+            { text: "Thu: Repo: api-test-[name].py to add a device", completed: false },
+            { text: "Fri: Repo: Add custom endpoint routes/custom.py", completed: false }
+        ]},
+        { id: 10, title: "Monitoring Concepts – Health Checks", phase: "Foundation", successGoal: "Link programming to equipment monitoring", tasks: [
+            { text: "Mon: REST principles module", link: "https://www.linkedin.com/learning/learning-rest-apis", completed: false },
+            { text: "Mon: AI – REST vs monitoring protocols", completed: false },
+            { text: "Tue: Repo: Create monitoring checks file", completed: false },
+            { text: "Wed: API responses module", link: "https://www.linkedin.com/learning/learning-rest-apis", completed: false },
+            { text: "Wed: AI – Responses like status reports", completed: false },
+            { text: "Thu: Repo: Add monitoring dashboard widget", completed: false },
+            { text: "Fri: Repo: Document monitoring setup (broadcast analogies)", completed: false }
+        ]},
+        { id: 11, title: "Data Visualization – Status Dashboards", phase: "Building", successGoal: "Working real-time displays", tasks: [
+            { text: "Mon: Visualization principles module", link: "https://www.linkedin.com/learning/data-visualization-best-practices", completed: false },
+            { text: "Mon: AI – Best ways to visualize equipment data", completed: false },
+            { text: "Tue: Repo: EquipmentChart.js (Chart.js) status distribution", completed: false },
+            { text: "Wed: Dashboard design module", link: "https://www.linkedin.com/learning/data-visualization-best-practices", completed: false },
+            { text: "Wed: Repo: Add color coding to main dashboard", completed: false },
+            { text: "Thu: Repo: Real-time status chart (WebSocket)", completed: false },
+            { text: "Fri: Repo: Add dashboard to navigation", completed: false }
+        ]},
+        { id: 12, title: "Real Features – Complete Monitoring (React)", phase: "Building", successGoal: "First end-to-end monitoring feature", tasks: [
+            { text: "Mon: React components setup module", link: "https://www.linkedin.com/learning/react-js-essential-training-14836121", completed: false },
+            { text: "Mon: Plan feature via GitHub Issues", completed: false },
+            { text: "Tue: Repo: MyEquipmentList with search & filter", completed: false },
+            { text: "Wed: Repo: EquipmentDetails modal (full info)", completed: false },
+            { text: "Thu: Repo: Implement WebSocket real-time updates", completed: false },
+            { text: "Fri: Deploy: Update docker-compose & test", completed: false }
+        ]},
+        { id: 13, title: "Error Handling – Failure Management", phase: "Building", successGoal: "Robust failure handling", tasks: [
+            { text: "Mon: Error handling strategies module", link: "https://www.linkedin.com/learning/programming-foundations-software-testing-qa", completed: false },
+            { text: "Mon: AI – Equipment failure protocols analogy", completed: false },
+            { text: "Tue: Repo: Add try/catch in devices routes", completed: false },
+            { text: "Wed: Repo: failure_handler.py for offline detection", completed: false },
+            { text: "Thu: Repo: Graceful degradation in DeviceList.js", completed: false },
+            { text: "Fri: Repo: Error logging device/error-handling.log", completed: false }
+        ]},
+        { id: 14, title: "Break – Assess Building Skills", phase: "Building", successGoal: "Confidence with shipped features", tasks: [
+            { text: "Review code with AI for improvements", completed: false },
+            { text: "Document learning in broadcast terms", completed: false },
+            { text: "Plan next phase", completed: false },
+            { text: "Rest & consolidate", completed: false }
+        ]},
+        { id: 15, title: "User Authentication – Secure Access", phase: "Building", successGoal: "Role-based secure system", tasks: [
+            { text: "Mon: Auth fundamentals module", link: "https://www.linkedin.com/learning/react-authentication-25660373", completed: false },
+            { text: "Mon: AI – Auth like equipment access control", completed: false },
+            { text: "Tue: Repo: Add custom user roles (auth-service)", completed: false },
+            { text: "Wed: Roles & permissions module", link: "https://www.linkedin.com/learning/react-authentication-25660373", completed: false },
+            { text: "Wed: Repo: Implement ProtectedRoute RBAC", completed: false },
+            { text: "Thu: Repo: SecureDeviceControls (modify equipment)", completed: false },
+            { text: "Fri: Repo: access_log.py audit logging", completed: false }
+        ]},
+        { id: 16, title: "Advanced APIs – Equipment Integration", phase: "Building", successGoal: "External system connectivity", tasks: [
+            { text: "Mon: Advanced API patterns module", link: "https://www.linkedin.com/learning/learning-rest-apis", completed: false },
+            { text: "Mon: AI – Best practices for equipment integration", completed: false },
+            { text: "Tue: Repo: snipeit_connector.py", completed: false },
+            { text: "Wed: API auth & security module", link: "https://www.linkedin.com/learning/learning-rest-apis", completed: false },
+            { text: "Wed: Repo: sync/device_sync.py bidirectional sync", completed: false },
+            { text: "Thu: Repo: retry_handler.py with retries & backoff", completed: false },
+            { text: "Fri: Repo: external_api_tests integration suite", completed: false }
+        ]},
+        { id: 17, title: "Performance – Production Monitoring", phase: "Building", successGoal: "Production-ready performance", tasks: [
+            { text: "Mon: DB performance optimization module", link: "https://www.linkedin.com/learning/advanced-python-working-with-databases-22307421", completed: false },
+            { text: "Mon: AI – Optimization for equipment monitoring", completed: false },
+            { text: "Tue: Repo: query_profiler.py", completed: false },
+            { text: "Wed: Query optimization techniques module", link: "https://www.linkedin.com/learning/advanced-python-working-with-databases-22307421", completed: false },
+            { text: "Wed: Repo: Optimize slow queries device model", completed: false },
+            { text: "Thu: Repo: device_cache.py (Redis caching)", completed: false },
+            { text: "Fri: Repo: performance-dashboard Grafana JSON", completed: false }
+        ]},
+        { id: 18, title: "Testing – Broadcast Quality Assurance", phase: "Building", successGoal: "Comprehensive automated testing", tasks: [
+            { text: "Mon: TDD fundamentals module", link: "https://www.linkedin.com/learning/programming-foundations-test-driven-development-3", completed: false },
+            { text: "Mon: AI – Testing like broadcast QA", completed: false },
+            { text: "Tue: Repo: test_device_status.py unit tests", completed: false },
+            { text: "Wed: Integration testing strategies module", link: "https://www.linkedin.com/learning/programming-foundations-test-driven-development-3", completed: false },
+            { text: "Wed: Repo: test_monitoring_workflow.py integration", completed: false },
+            { text: "Thu: Repo: test_equipment_failures.py E2E failure sims", completed: false },
+            { text: "Fri: Repo: CI/CD workflow testing.yml", completed: false }
+        ]},
+        { id: 19, title: "System Architecture – Broadcast Infrastructure Design", phase: "Advanced", successGoal: "Professional architecture articulation", tasks: [
+            { text: "Mon: Architecture patterns module", link: "https://www.linkedin.com/learning/software-architecture-foundations", completed: false },
+            { text: "Mon: AI – Software architecture vs broadcast facility design", completed: false },
+            { text: "Tue: Repo: system-overview-[name].md", completed: false },
+            { text: "Wed: System design principles module", link: "https://www.linkedin.com/learning/software-architecture-foundations", completed: false },
+            { text: "Wed: Repo: microservices-plan.md improvements", completed: false },
+            { text: "Thu: Create diagrams (draw.io) in docs/architecture/diagrams", completed: false },
+            { text: "Fri: Propose improvements via GitHub issue (broadcast analogies)", completed: false }
+        ]},
+        { id: 20, title: "Advanced Integration – Enterprise Equipment Systems", phase: "Advanced", successGoal: "Enterprise-grade external integrations", tasks: [
+            { text: "Mon: Watch 'API design principles' module", link: "https://www.linkedin.com/learning/designing-restful-apis", completed: false },
+            { text: "Mon: Repo: Document external API requirements (api-requirements.md)", completed: false },
+            { text: "Tue: Repo: Build Snipe-IT integration (services/integration-service/app/snipeit/)", completed: false },
+            { text: "Wed: Watch 'API documentation & versioning' module", link: "https://www.linkedin.com/learning/designing-restful-apis", completed: false },
+            { text: "Wed: Repo: Create OpenAPI spec external-integrations.yaml", completed: false },
+            { text: "Thu: Repo: Implement complex error handling (error_handling/)", completed: false },
+            { text: "Fri: Repo: Deploy integration to staging & document deployment", completed: false }
+        ]},
+        { id: 21, title: "Deployment & DevOps – Production Broadcast Systems", phase: "Advanced", successGoal: "Reliable production deployment workflow", tasks: [
+            { text: "Mon: Watch 'Containerization basics' (Learning Docker) + AI DevOps practices", link: "https://www.linkedin.com/learning/learning-docker-2", completed: false },
+            { text: "Tue: Configure production environment settings", completed: false },
+            { text: "Wed: Watch 'CI/CD pipelines' (DevOps Foundations) + Implement deployment pipeline", link: "https://www.linkedin.com/learning/devops-foundations", completed: false },
+            { text: "Thu: Configure production monitoring & alerting", completed: false },
+            { text: "Fri: Full production deployment + AI operations review", completed: false }
+        ]},
+        { id: 22, title: "Break Week – Mastery Assessment", phase: "Advanced", successGoal: "Ready for technical leadership", tasks: [
+            { text: "Comprehensive code review with AI (senior dev role)", completed: false },
+            { text: "Architecture assessment & improvement recommendations", completed: false },
+            { text: "Career development planning with AI", completed: false },
+            { text: "Rest & prepare for leadership phase", completed: false }
+        ]},
+        { id: 23, title: "Team Leadership – Mentoring Engineers", phase: "Advanced", successGoal: "Effective mentoring capability", tasks: [
+            { text: "Mon: Watch 'Coaching & mentoring' + AI guidance teaching engineers", link: "https://www.linkedin.com/learning/coach-your-team-to-learn-stretch-and-grow", completed: false },
+            { text: "Tue: Conduct code review session for teammate", completed: false },
+            { text: "Wed: Watch 'Building technical skills in teams' + Lead system improvement discussion", link: "https://www.linkedin.com/learning/coach-your-team-to-learn-stretch-and-grow", completed: false },
+            { text: "Thu: Mentor colleague through programming challenge", completed: false },
+            { text: "Fri: Leadership skills reflection with AI", completed: false }
+        ]},
+        { id: 24, title: "Innovation Projects – Custom Broadcast Solutions", phase: "Advanced", successGoal: "Novel broadcast-focused solution", tasks: [
+            { text: "Mon: Watch 'Problem identification & analysis' + Identify unique challenges", link: "https://www.linkedin.com/learning/strategic-thinking", completed: false },
+            { text: "Tue: Design custom solution architecture w/ AI", completed: false },
+            { text: "Wed: Watch 'Solution design & planning' + Prototype proof-of-concept", link: "https://www.linkedin.com/learning/strategic-thinking", completed: false },
+            { text: "Thu: Implement core functionality", completed: false },
+            { text: "Fri: Demo solution (AI presentation coaching)", completed: false }
+        ]},
+        { id: 25, title: "Professional Practice – Industry Standards", phase: "Advanced", successGoal: "Professional-grade engineering habits", tasks: [
+            { text: "Mon: Watch 'Professional development practices' + AI consultation", link: "https://www.linkedin.com/learning/programming-foundations-real-world-examples", completed: false },
+            { text: "Tue: Implement documentation & commenting standards", completed: false },
+            { text: "Wed: Watch 'Industry best practices' + Setup pro dev tools", link: "https://www.linkedin.com/learning/programming-foundations-real-world-examples", completed: false },
+            { text: "Thu: Peer code review & collaboration workflow practice", completed: false },
+            { text: "Fri: Professional skills evaluation with AI", completed: false }
+        ]},
+        { id: 26, title: "Graduation – Portfolio & Next Steps", phase: "Advanced", successGoal: "Ready to lead and teach others", tasks: [
+            { text: "Mon: Watch 'Building your professional brand' + Build portfolio", link: "https://www.linkedin.com/learning/learning-personal-branding-2018", completed: false },
+            { text: "Tue: Document case studies of solved broadcast problems", completed: false },
+            { text: "Wed: Watch 'Career positioning strategies' + Plan next phase", link: "https://www.linkedin.com/learning/learning-personal-branding-2018", completed: false },
+            { text: "Thu: Network with broadcast engineers who program", completed: false },
+            { text: "Fri: Celebrate transformation & reflect achievements", completed: false }
+        ]},
     ];
     
     return {
@@ -260,44 +484,55 @@ const WeeklyPlanSheet = ({ userData, onToggleTask, isReadOnly = false }) => {
     const ChecklistItem = ({ task, onToggle }) => (
         <div onClick={isReadOnly ? null : onToggle} className={`flex items-center p-3 bg-gray-50 rounded-lg ${!isReadOnly ? 'cursor-pointer hover:bg-gray-100' : ''} transition-colors`}>
             {task.completed ? <CheckSquare className="w-5 h-5 mr-3 text-green-600" /> : <Square className="w-5 h-5 mr-3 text-gray-400" />}
-            <span className={`flex-1 ${task.completed ? 'text-gray-500 line-through' : 'text-gray-700'}`}>{task.text}</span>
+            <span className={`flex-1 ${task.completed ? 'text-gray-500 line-through' : 'text-gray-700'}`}>{task.text.replace(/^(Mon|Tue|Wed|Thu|Fri):\s*/, '')}</span>
             {task.link && (<a href={task.link} target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} className="ml-2 p-1 rounded-full hover:bg-blue-100"><ExternalLink className="w-4 h-4 text-blue-600" /></a>)}
         </div>
     );
+
+    const extractSuccessGoal = (week) => {
+        if (week.successGoal) return week.successGoal;
+        const sgTask = (week.tasks || []).find(t => /^Success Goal:/i.test(t.text));
+        return sgTask ? sgTask.text.replace(/^Success Goal:\s*/i, '') : '';
+    };
 
     return (
         <Card>
             <h3 className="text-xl font-bold mb-4">24-Week Learning Plan</h3>
             <div className="space-y-2">
-                {userData.weeks.map(week => (
-                    <div key={week.id} className="border border-gray-200 rounded-lg">
-                        <div
-                            className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50"
-                            onClick={() => setOpenWeek(openWeek === week.id ? null : week.id)}
-                        >
-                            <div className="flex-grow">
-                                <div className="flex items-center gap-4">
-                                    <h4 className="font-bold text-lg text-gray-800">Week {week.id}: {week.title}</h4>
-                                    <PhaseIndicator phase={week.phase} />
+                {userData.weeks.map(week => {
+                    const successGoal = extractSuccessGoal(week);
+                    const displayTasks = (week.tasks || []).filter(t => !/^Success Goal:/i.test(t.text));
+                    return (
+                        <div key={week.id} className="border border-gray-200 rounded-lg">
+                            <div
+                                className="flex items-start justify-between p-4 cursor-pointer hover:bg-gray-50"
+                                onClick={() => setOpenWeek(openWeek === week.id ? null : week.id)}
+                            >
+                                <div className="flex-grow">
+                                    <div className="flex items-center gap-4">
+                                        <h4 className="font-bold text-lg text-gray-800">Week {week.id}: {week.title}</h4>
+                                        <PhaseIndicator phase={week.phase} />
+                                    </div>
+                                    {successGoal && <p className="mt-1 text-sm text-gray-600 italic">Success Goal: {successGoal}</p>}
+                                    <div className="mt-2 flex items-center gap-3">
+                                        <div className="w-full"><ProgressBar progress={week.progress} /></div>
+                                        <span className="text-sm font-semibold text-gray-600 w-12 text-right">{week.progress}%</span>
+                                    </div>
                                 </div>
-                                <div className="mt-2 flex items-center gap-3">
-                                    <div className="w-full"><ProgressBar progress={week.progress} /></div>
-                                    <span className="text-sm font-semibold text-gray-600 w-12 text-right">{week.progress}%</span>
-                                </div>
+                                <ChevronDown className={`w-4 h-4 text-gray-500 mt-1 transition-transform ${openWeek === week.id ? 'rotate-180' : ''}`} />
                             </div>
-                            <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${openWeek === week.id ? 'rotate-180' : ''}`} />
+                            {openWeek === week.id && (
+                                <div className="p-4 border-t border-gray-200 bg-white">
+                                    <div className="space-y-3">
+                                        {displayTasks.map((task, index) => (
+                                            <ChecklistItem key={index} task={task} onToggle={() => onToggleTask(week.id, index)} />
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
-                        {openWeek === week.id && (
-                            <div className="p-4 border-t border-gray-200 bg-white">
-                                <div className="space-y-3">
-                                    {week.tasks.map((task, index) => (
-                                        <ChecklistItem key={index} task={task} onToggle={() => onToggleTask(week.id, index)} />
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         </Card>
     );
@@ -747,6 +982,13 @@ const TeacherDashboard = ({ allStudentsData, onSelectStudent, onSignOut, onRefre
                             <span className={isRefreshing ? 'animate-spin' : ''}>🔄</span>
                             {isRefreshing ? 'Refreshing...' : 'Refresh Data'}
                         </button>
+                        <button 
+                            onClick={() => window.runMigration()} 
+                            className="flex items-center gap-2 bg-yellow-100 text-yellow-700 p-2 rounded-lg font-semibold text-sm hover:bg-yellow-200"
+                        >
+                            <span>⚙️</span>
+                            Run Migration
+                        </button>
                         <button onClick={onSignOut} className="flex items-center gap-2 bg-red-100 text-red-700 p-2 rounded-lg font-semibold text-sm hover:bg-red-200">
                             <LogOut className="w-4 h-4" />
                             Logout
@@ -910,6 +1152,8 @@ const WorkbookContainer = ({ user, userData, onUpdate, onToggleTask, onSignOut, 
         return <LoadingSpinner />;
     }
 
+
+
     return (
         <div className="bg-gray-100 min-h-screen font-sans">
             <header className="bg-white shadow-md p-4 sticky top-0 z-20">
@@ -925,7 +1169,7 @@ const WorkbookContainer = ({ user, userData, onUpdate, onToggleTask, onSignOut, 
                                     <span className="text-gray-600">👥</span>
                                     {isEditingName ? (
                                         <div className="flex items-center gap-2">
-                                            <input type="text" value={newDisplayName} onChange={(e) => setNewDisplayName(e.target.value)} className="p-1 border rounded-md text-sm" autoFocus />
+                                            <input type="text" value={newDisplayName} onChange={e => setNewDisplayName(e.target.value)} className="p-1 border rounded-md text-sm" autoFocus />
                                             <button onClick={handleSaveName} className="p-1 text-green-600 hover:bg-green-100 rounded-full"><Save className="w-4 h-4" /></button>
                                         </div>
                                     ) : (
